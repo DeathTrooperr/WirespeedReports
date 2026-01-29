@@ -120,7 +120,7 @@ export class WirespeedApi {
 	}
 
 	async getAssetsByDetectionId(id: string): Promise<Assets> {
-		return this.request(`/asset/detection/${id}`, {
+		return this.request<Assets>(`/asset/detection/${id}`, {
 			method: 'GET'
 		});
 	}

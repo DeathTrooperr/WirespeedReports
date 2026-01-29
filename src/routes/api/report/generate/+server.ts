@@ -72,11 +72,11 @@ export const POST: RequestHandler = async ({ request }) => {
 			const ms = metric.unit === 'seconds' ? avg * 1000 : avg;
 
 			if (ms < 1000) {
-				return `${ms.toFixed(2)}ms`;
+				return `${ms.toFixed(0)}ms`;
 			} else if (ms < 60000) {
-				return `${(ms / 1000).toFixed(2)}s`;
+				return `${(ms / 1000).toFixed(1)}s`;
 			} else {
-				return `${(ms / 60000).toFixed(2)}m`;
+				return `${(ms / 60000).toFixed(1)}m`;
 			}
 		};
 
@@ -101,10 +101,8 @@ export const POST: RequestHandler = async ({ request }) => {
 				if (endpoint) endpointsMap[endpoint] = (endpointsMap[endpoint] || 0) + 1;
 			});
 			assets.directory.forEach((u) => {
-				const integration = u.integrationId as any;
-				const platform = integration?.platform || '';
 				const identity = u.displayName || u.email;
-				if(identity && u.directoryId) identitiesMap[identity] = (identitiesMap[identity] || 0) + 1;
+				if (identity && u.directoryId) identitiesMap[identity] = (identitiesMap[identity] || 0) + 1;
 			});
 		});
 
