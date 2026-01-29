@@ -89,6 +89,7 @@ export interface ReportData {
         mttr: string;
         mttd: string;
         mttv: string;
+        mttc: string;
     };
 
     funnelData: {

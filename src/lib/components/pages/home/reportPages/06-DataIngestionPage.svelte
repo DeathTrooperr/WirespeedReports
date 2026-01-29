@@ -31,7 +31,7 @@
                 <div class="flex-1 flex flex-col items-center group h-full justify-end">
                     <div class="w-full relative flex flex-col justify-end h-full">
                         <div 
-                            class="bg-primary/20 hover:bg-primary w-full rounded-t-lg transition-all duration-700 relative" 
+                            class="bg-primary/20 hover:bg-primary print:bg-primary w-full rounded-t-lg transition-all duration-700 relative" 
                             style="height: {(item.countValue / (topIntegrations[0]?.countValue || 1)) * 100}%"
                         >
                             <div class="absolute -top-6 left-0 w-full text-center">
@@ -77,7 +77,7 @@
                         <div class="flex items-center gap-3">
                             <div class="flex-grow h-1.5 bg-gray-100 rounded-full overflow-hidden">
                                 <div 
-                                    class="h-full bg-primary/20 rounded-full transition-all duration-1000 group-hover:bg-primary/40" 
+                                    class="h-full bg-primary/20 rounded-full transition-all duration-1000 group-hover:bg-primary/40 print:bg-primary/40" 
                                     style="width: {(item.countValue / data.funnelData.total) * 100}%"
                                 ></div>
                             </div>

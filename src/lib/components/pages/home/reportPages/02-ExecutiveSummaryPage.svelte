@@ -43,24 +43,54 @@
     </ReportSection>
 
     <ReportSection title="Performance Metrics">
-        <div class="grid grid-cols-3 gap-6">
-            <div class="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group">
-                <div class="absolute bottom-0 left-0 right-0 h-1 bg-primary/10"></div>
-                <p class="text-foreground/40 text-[9px] uppercase font-black mb-2 tracking-[0.2em]">MTTR</p>
-                <p class="text-2xl font-black text-primary tracking-tighter">{data.meanTimeMetrics.mttr}</p>
-                <p class="text-foreground/50 text-[8px] mt-2 font-bold uppercase tracking-widest italic">Mean Time To Respond</p>
-            </div>
-            <div class="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group">
-                <div class="absolute bottom-0 left-0 right-0 h-1 bg-primary/10"></div>
+        <div class="grid grid-cols-4 gap-6 relative">
+            <div class="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group hover:border-primary/20 transition-colors">
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-primary"></div>
                 <p class="text-foreground/40 text-[9px] uppercase font-black mb-2 tracking-[0.2em]">MTTD</p>
                 <p class="text-2xl font-black text-primary tracking-tighter">{data.meanTimeMetrics.mttd}</p>
                 <p class="text-foreground/50 text-[8px] mt-2 font-bold uppercase tracking-widest italic">Mean Time To Detect</p>
             </div>
-            <div class="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group">
-                <div class="absolute bottom-0 left-0 right-0 h-1 bg-primary/10"></div>
+
+            <!-- Arrow -->
+            <div class="absolute top-1/2 left-[24%] -translate-y-1/2 -translate-x-1/2 z-10 hidden lg:block">
+                <svg class="w-6 h-6 text-primary/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
+            <div class="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group hover:border-primary/20 transition-colors">
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-primary"></div>
                 <p class="text-foreground/40 text-[9px] uppercase font-black mb-2 tracking-[0.2em]">MTTV</p>
                 <p class="text-2xl font-black text-primary tracking-tighter">{data.meanTimeMetrics.mttv}</p>
                 <p class="text-foreground/50 text-[8px] mt-2 font-bold uppercase tracking-widest italic">Mean Time To Verdict</p>
+            </div>
+
+            <!-- Arrow -->
+            <div class="absolute top-1/2 left-[50%] -translate-y-1/2 -translate-x-1/2 z-10 hidden lg:block">
+                <svg class="w-6 h-6 text-primary/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
+            <div class="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group hover:border-primary/20 transition-colors">
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-primary"></div>
+                <p class="text-foreground/40 text-[9px] uppercase font-black mb-2 tracking-[0.2em]">MTTC</p>
+                <p class="text-2xl font-black text-primary tracking-tighter">{data.meanTimeMetrics.mttc || "N/A"}</p>
+                <p class="text-foreground/50 text-[8px] mt-2 font-bold uppercase tracking-widest italic">Mean Time To Contain</p>
+            </div>
+
+            <!-- Arrow -->
+            <div class="absolute top-1/2 left-[76%] -translate-y-1/2 -translate-x-1/2 z-10 hidden lg:block">
+                <svg class="w-6 h-6 text-primary/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
+            <div class="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group hover:border-primary/20 transition-colors">
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-primary"></div>
+                <p class="text-foreground/40 text-[9px] uppercase font-black mb-2 tracking-[0.2em]">MTTR</p>
+                <p class="text-2xl font-black text-primary tracking-tighter">{data.meanTimeMetrics.mttr}</p>
+                <p class="text-foreground/50 text-[8px] mt-2 font-bold uppercase tracking-widest italic">Mean Time To Respond</p>
             </div>
         </div>
     </ReportSection>

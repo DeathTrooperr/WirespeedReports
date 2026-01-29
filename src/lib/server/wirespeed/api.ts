@@ -100,6 +100,16 @@ export class WirespeedApi {
 	}
 
 	/**
+	 * Calculate mean time to contain
+	 */
+	async getMttc(days: number): Promise<TimeAverageAndChange> {
+		return this.request<TimeAverageAndChange>('/cases/mttc', {
+			method: 'POST',
+			body: JSON.stringify({ days })
+		});
+	}
+
+	/**
 	 * Search and list cases
 	 */
 	async getCases(query: SearchCasesDto): Promise<Cases> {

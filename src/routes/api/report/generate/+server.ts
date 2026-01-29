@@ -36,13 +36,14 @@ export const POST: RequestHandler = async ({ request }) => {
 		const diffTime = Math.abs(end.getTime() - start.getTime());
 		const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
 
-		const [team, stats, severityStats, mttr, mttd, mttv, cases, detections] = await Promise.all([
+		const [team, stats, severityStats, mttr, mttd, mttv, mttc, cases, detections] = await Promise.all([
 			api.getCurrentTeam(),
 			api.getTeamStatistics(days),
 			api.getCasesStatsBySeverity(days),
 			api.getMttr(days),
 			api.getMttd(days),
 			api.getMttv(days),
+			api.getMttc(days),
 			api.getCases({
 				orderBy: 'createdAt',
 				orderDir: 'desc',
@@ -75,8 +76,12 @@ export const POST: RequestHandler = async ({ request }) => {
 				return `${ms.toFixed(0)}ms`;
 			} else if (ms < 60000) {
 				return `${(ms / 1000).toFixed(1)}s`;
-			} else {
+			} else if (ms < 3600000) {
 				return `${(ms / 60000).toFixed(1)}m`;
+			} else if (ms < 86400000) {
+				return `${(ms / 3600000).toFixed(1)} hour${ms === 3600000 ? '' : 's'}`;
+			} else {
+				return `${(ms / 86400000).toFixed(1)} day${ms === 86400000 ? '' : 's'}`;
 			}
 		};
 
@@ -201,7 +206,8 @@ export const POST: RequestHandler = async ({ request }) => {
 			meanTimeMetrics: {
 				mttr: formatTimeMetric(mttr),
 				mttd: formatTimeMetric(mttd),
-				mttv: formatTimeMetric(mttv)
+				mttv: formatTimeMetric(mttv),
+				mttc: formatTimeMetric(mttc),
 			},
 
 			funnelData: {
