@@ -235,6 +235,7 @@ export interface TeamStatistics {
 }
 
 export interface PlatformLogoResponse {
+	platformLogo: string;
 	platformLogoLight: string;
 	platformLogoDark: string;
 }

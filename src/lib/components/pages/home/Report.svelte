@@ -149,7 +149,7 @@
     });
 </script>
 
-<div class="bg-gray-100 py-10 print:p-0 print:bg-white" style={customStyles}>
+<div class="py-10 print:p-0 print:bg-white" style={customStyles}>
     <TitlePage {data} {totalPages} />
     
     <ExecutiveSummaryPage {data} {totalPages} />

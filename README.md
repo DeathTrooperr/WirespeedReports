@@ -1,86 +1,89 @@
 # Wirespeed Security Operations Reports
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-blueviolet?style=for-the-badge)](https://wirespeed-reports.northernlight.workers.dev/)
+A professional, high-performance report generation engine for Wirespeed Managed Detection & Response (MDR). This platform transforms complex security telemetry into executive-grade, print-ready A4 reports, providing clear insights into security posture and operational efficiency.
 
-A modern, high-performance security report generator for Wirespeed Managed Detection & Response (MDR). This tool generates professional, print-ready A4 security operations reports directly from the Wirespeed API, optimized for clarity, speed, and executive-level presentation.
+## 🌟 Key Features
 
-## 🚀 Features
+### 🛡️ Automated Intelligence
+Seamlessly integrates with the Wirespeed API to aggregate real-time data across your entire security stack, ensuring accurate and up-to-date reporting.
 
-- **Automated Intelligence**: Real-time data retrieval from the Wirespeed API for accurate security telemetry.
-- **Modern Professional Design**: A clean, minimalist aesthetic with subtle gradients and high-end typography.
-- **Precision Layout**: Pixel-perfect A4 document structure with automatic page breaking and consistent branding.
-- **Comprehensive Analysis**:
-    - **Executive Summary**: High-level posture overview and service coverage insights.
-    - **Detection Pipeline**: Visual breakdown of the alert funnel and automation efficiency.
-    - **Response Activity**: Categorized escalated cases sorted by severity and impact.
-    - **Asset Intelligence**: Geographic login analysis and OS distribution tracking.
-    - **Infrastructure Overview**: Detailed event ingestion metrics by source and volume.
-- **Universal Export**: CSS-optimized for high-fidelity PDF generation and physical printing.
+### 🎨 Professional Design & Branding
+- **Executive Aesthetics**: Clean, minimalist design optimized for readability and professional presentation.
+- **Service Provider Support**: Fully customizable branding for MSPs, including white-label logos and primary color synchronization.
+- **Precision Layout**: Pixel-perfect A4 document structure with automatic page breaking and consistent typography.
+
+### 📊 Comprehensive Insights
+- **Executive Summary**: High-level overview of security posture and service coverage.
+- **Detection Pipeline**: Visual breakdown of alert processing efficiency and automation impact.
+- **Response Activity**: Categorized escalated cases with detailed severity and response tracking.
+- **Asset Intelligence**: Geographic analysis of suspicious activities and endpoint distribution.
+- **Infrastructure Overview**: Detailed event ingestion metrics by source and volume.
+
+### 📥 Versatile Export Options
+- **Bulk Export**: Generate multiple client reports simultaneously, delivered as a secure ZIP archive.
+- **High-Fidelity PDF**: CSS-optimized rendering specifically designed for headless browser environments and physical printing.
 
 ## 🛠 Tech Stack
 
-- **Framework**: [Svelte 5](https://svelte.dev) (Runes-native)
-- **Styling**: [Tailwind CSS 4](https://tailwindcss.com) (Modern utility-first CSS)
-- **Platform**: [Cloudflare Workers](https://workers.cloudflare.com/) (Edge-deployed for global speed)
-- **Language**: TypeScript (Type-safe throughout)
+- **Frontend**: [Svelte 5](https://svelte.dev) (utilizing modern Runes-native state management)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com) (utility-first, high-performance styling)
+- **Runtime**: [Cloudflare Workers](https://workers.cloudflare.com/) & [Browser Rendering](https://developers.cloudflare.com/browser-rendering/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/) (ensuring robust type safety across the stack)
 
-## 🏁 Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
-
 - Node.js (v20 or later)
-- A Wirespeed API Key
+- A valid Wirespeed API Key
 
 ### Installation
-
 1. Clone the repository:
    ```bash
    git clone https://github.com/your-org/WirespeedReports.git
    cd WirespeedReports
    ```
-
 2. Install dependencies:
    ```bash
    npm install
    ```
 
 ### Development
-
-Start the development server:
+Launch the development environment:
 ```bash
 npm run dev
 ```
-
-The application will be available at `http://localhost:5173`. You can use the sidebar to input your API key and preview reports with live data.
+Access the application at `http://localhost:5173`.
 
 ### Deployment
-
-Configured for seamless deployment on Cloudflare Workers.
-
+The project is optimized for deployment on Cloudflare's edge network.
 1. Authenticate with Wrangler:
    ```bash
    npx wrangler login
    ```
-
-2. Deploy:
+2. Deploy to production:
    ```bash
    npm run deploy
    ```
 
-## 📄 Usage
+## 📖 Usage
 
-1. **Authentication**: Enter your Wirespeed API key in the configuration panel.
-2. **Configuration**: Select your desired reporting period (Monthly, Quarterly, etc.).
-3. **Generation**: Click "Generate Report" to aggregate data and render the preview.
-4. **Export**: Use the "Print / Download" button. For the best PDF quality, ensure "Background Graphics" is enabled in your browser's print settings.
+1. **Authentication**: Enter your Wirespeed API key in the configuration sidebar.
+2. **Account Mode**: The system automatically detects if you are an Individual or Service Provider.
+3. **Configuration**: 
+    - Select your reporting period (Monthly, Quarterly, Yearly, or Custom).
+    - Service Providers can select specific clients and customize branding colors.
+4. **Generation**: Click "Generate Report" to build the live preview.
+5. **Export**: 
+    - Use "Print / Download" for individual PDF generation.
+    - Use "Bulk Export" to generate and download reports for multiple clients at once.
 
 ## 🏗 Project Structure
 
-- `src/lib/server/wirespeed`: API client and data transformation logic.
-- `src/lib/components/pages/home/layout`: Core document structure (Headers, Footers, Page wrappers).
-- `src/lib/components/pages/home/reportPages`: Modular page implementations.
-- `src/routes/api/report/generate`: Server-side data aggregation and sanitization.
+- `src/lib/server/report`: Core data aggregation and report generation logic.
+- `src/lib/server/wirespeed`: Wirespeed API client and specialized telemetry types.
+- `src/lib/components/pages/home`: Svelte components for the report engine and modular page layouts.
+- `src/routes/api`: Serverless endpoints for data fetching and headless PDF generation.
 
 ---
 
-Built with ❤️ by the Wirespeed community.
+Built with precision for the Wirespeed security ecosystem by a Wirespeed fan!

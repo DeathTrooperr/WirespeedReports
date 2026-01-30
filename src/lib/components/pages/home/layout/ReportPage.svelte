@@ -20,7 +20,7 @@
     } = $props();
 </script>
 
-<div class="a4-page page-break bg-linear-to-bl from-primary/5 via-white to-white">
+<div class="a4-page page-break bg-white" style="background-image: linear-gradient(to bottom left, color-mix(in srgb, var(--primary), white 95%), white, white);">
     <ReportHeader {reportPeriodLabel} {branding} />
     
     <div class="flex-grow flex flex-col">

@@ -257,24 +257,38 @@
         errorMessage = '';
 
         try {
-            for (const teamId of selectedTeamIds) {
-                const team = teams.find(t => t.id === teamId);
-                if (!team) continue;
+            const response = await fetch('/api/generate/bulk', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    apiKey,
+                    teamIds: selectedTeamIds,
+                    customColors: { primary: primaryColor },
+                    timeframe: {
+                        startDate: dateRange.start,
+                        endDate: dateRange.end,
+                        periodLabel
+                    }
+                })
+            });
 
-                const data = await generateReport(teamId);
-                if (data) {
-                    // We need a way to trigger print/download for each
-                    // Since window.print() is manual, for bulk we might just want to 
-                    // eventually support PDF generation server-side, 
-                    // but for now let's at least show them or download as JSON/Blob if possible.
-                    // The requirement says "bulk explore" and "bulk export".
-                    // If we can't do headless PDF here, maybe we just alert that it's starting?
-                    console.log(`Generated report for ${team.name}`);
-                }
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Wirespeed_Reports_Bulk_${new Date().toISOString().slice(0, 10)}.zip`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } else {
+                const errorData = (await response.json()) as { error?: string };
+                errorMessage = errorData.error || 'Failed to generate bulk reports.';
             }
-            alert('Bulk generation complete. (Note: Automatic PDF download for multiple files requires server-side generation or a more complex frontend implementation)');
         } catch (e) {
-            errorMessage = 'Error during bulk export.';
+            console.error('Bulk export error:', e);
+            errorMessage = 'An unexpected error occurred during bulk export.';
         } finally {
             isBulkExporting = false;
         }
@@ -456,7 +470,7 @@
 
             <!-- Report Type Split -->
             <div class="pt-6 border-t border-white/10 space-y-6">
-                <!-- {#if mode === 'service-provider'}
+                {#if mode === 'service-provider'}
                     <div class="flex p-1 bg-white/5 rounded-lg">
                         <button 
                             onclick={() => reportingMode = 'single'}
@@ -471,7 +485,7 @@
                             Bulk
                         </button>
                     </div>
-                {/if} -->
+                {/if}
 
                 {#if reportingMode === 'single'}
                     <div class="space-y-4 animate-in fade-in slide-in-from-top-2">
@@ -579,11 +593,11 @@
             </div>
         {/if}
 
-        {#if reportData}
+        {#if reportData && !isBulkExporting}
             <div class="flex justify-center origin-top transform scale-[0.7] sm:scale-[0.85] xl:scale-100 transition-transform print:transform-none print:scale-100 print:block">
                 <Report data={reportData} />
             </div>
-        {:else if isGenerating}
+        {:else if isGenerating || isBulkExporting}
             <div class="h-full flex flex-col items-center justify-center gap-12 animate-in fade-in duration-700">
                 <div class="relative">
                     <div class="relative w-32 h-32">
@@ -596,9 +610,15 @@
                         
                         <!-- Inner pulsing shield/icon placeholder -->
                         <div class="absolute inset-8 bg-gradient-to-br from-[#6d28d9]/20 to-[#6d28d9]/5 rounded-xl rotate-45 animate-pulse flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-[#6d28d9] -rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                            </svg>
+                            {#if isBulkExporting}
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-[#6d28d9] -rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                            {:else}
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-[#6d28d9] -rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                </svg>
+                            {/if}
                         </div>
                     </div>
                     
@@ -608,16 +628,15 @@
                 </div>
 
                 <div class="text-center space-y-3 max-w-md">
-                    <h2 class="text-2xl font-black text-gray-900 tracking-tight">Compiling Intelligence</h2>
+                    <h2 class="text-2xl font-black text-gray-900 tracking-tight">
+                        {isBulkExporting ? 'Generating Batch' : 'Compiling Intelligence'}
+                    </h2>
                     <div class="flex flex-col items-center gap-2">
                         <p class="text-sm text-gray-500 font-medium leading-relaxed">
-                            Aggregating telemetry from across your security stack and generating high-fidelity analytics.
+                            {isBulkExporting 
+                                ? 'Processing multiple client reports and preparing your secure download package.' 
+                                : 'Aggregating telemetry from across your security stack and generating high-fidelity analytics.'}
                         </p>
-                        <div class="flex gap-1 mt-2">
-                            <div class="w-1 h-1 bg-[#6d28d9] rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                            <div class="w-1 h-1 bg-[#6d28d9] rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                            <div class="w-1 h-1 bg-[#6d28d9] rounded-full animate-bounce"></div>
-                        </div>
                     </div>
                 </div>
                 
