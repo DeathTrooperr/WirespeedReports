@@ -301,13 +301,13 @@
 
 <div class="flex h-screen bg-gray-50 overflow-hidden print:h-auto print:overflow-visible print:block">
     <!-- Sidebar -->
-    <aside class="w-80 bg-[#6d28d9] text-white flex flex-col shadow-xl z-10 print:hidden">
-        <div class="p-6 border-b border-white/10">
-            <h1 class="text-xl font-black tracking-tight uppercase">Report Generator</h1>
-            <p class="text-xs text-white/60 mt-1">Configure your security report</p>
+    <aside class="w-full sm:w-60 md:w-64 lg:w-72 flex-shrink-0 bg-[#6d28d9] text-white flex flex-col z-10 print:hidden transition-all duration-300 border-r border-white/10">
+        <div class="p-4 border-b border-white/10">
+            <h1 class="text-lg font-black tracking-tight uppercase">Report Generator</h1>
+            <p class="text-[10px] text-white/60 mt-0.5">Configure your security report</p>
         </div>
 
-        <div class="flex-grow p-6 space-y-6 overflow-y-auto">
+        <div class="flex-grow p-4 space-y-6 overflow-y-auto">
             <!-- Global Config: API Key & Mode -->
             <div class="space-y-4">
                 <div class="space-y-2">
@@ -338,34 +338,34 @@
 
                 {#if mode === 'service-provider'}
                     <div transition:slide={{ duration: 300 }} class="grid grid-cols-2 gap-3 pt-2">
-                        <div class="space-y-2">
-                            <label for="themeSelect" class="text-[10px] font-black uppercase tracking-widest text-white/50">Logo Theme</label>
-                            <div class="flex p-1 bg-white/5 rounded-lg border border-white/10 h-[40px] items-center">
+                        <div class="space-y-1">
+                            <label for="themeSelect" class="text-[9px] font-black uppercase tracking-widest text-white/50">Logo Theme</label>
+                            <div class="flex p-0.5 bg-white/5 rounded-lg border border-white/10 h-[36px] items-center">
                                 <button 
                                     onclick={() => theme = 'light'}
-                                    class="flex-1 h-full py-1 text-[9px] font-black uppercase tracking-wider rounded transition-all {theme === 'light' ? 'bg-white/20 text-white' : 'text-white/40 hover:text-white'}"
+                                    class="flex-1 h-full py-0.5 text-[8px] font-black uppercase tracking-wider rounded transition-all {theme === 'light' ? 'bg-white/20 text-white' : 'text-white/40 hover:text-white'}"
                                 >
                                     Light
                                 </button>
                                 <button 
                                     onclick={() => theme = 'dark'}
-                                    class="flex-1 h-full py-1 text-[9px] font-black uppercase tracking-wider rounded transition-all {theme === 'dark' ? 'bg-white/20 text-white' : 'text-white/40 hover:text-white'}"
+                                    class="flex-1 h-full py-0.5 text-[8px] font-black uppercase tracking-wider rounded transition-all {theme === 'dark' ? 'bg-white/20 text-white' : 'text-white/40 hover:text-white'}"
                                 >
                                     Dark
                                 </button>
                             </div>
                         </div>
-                        <div class="space-y-2">
-                            <label for="primaryColor" class="text-[10px] font-black uppercase tracking-widest text-white/50">Color</label>
-                            <div class="flex items-center h-[40px] px-3 bg-white/5 rounded-lg border border-white/10">
+                        <div class="space-y-1">
+                            <label for="primaryColor" class="text-[9px] font-black uppercase tracking-widest text-white/50">Color</label>
+                            <div class="flex items-center h-[36px] px-2 bg-white/5 rounded-lg border border-white/10">
                                 <div class="flex items-center gap-2 w-full">
                                     <input 
                                         type="color" 
                                         id="primaryColor"
                                         bind:value={primaryColor}
-                                        class="w-6 h-6 rounded border-none bg-transparent cursor-pointer p-0"
+                                        class="w-5 h-5 rounded border-none bg-transparent cursor-pointer p-0"
                                     />
-                                    <span class="text-[10px] font-mono text-white/40 uppercase truncate flex-grow">{primaryColor}</span>
+                                    <span class="text-[9px] font-mono text-white/40 uppercase truncate flex-grow">{primaryColor}</span>
                                 </div>
                             </div>
                         </div>
@@ -509,18 +509,18 @@
                         <button 
                             onclick={() => generateReport()}
                             disabled={isGenerating || (mode === 'service-provider' && !selectedTeamId)}
-                            class="w-full bg-[#f3f4f6] text-[#6d28d9] font-bold py-3 rounded-lg hover:bg-[#f3f4f6]/90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                            class="w-full bg-[#f3f4f6] text-[#6d28d9] font-bold py-2.5 rounded-lg hover:bg-[#f3f4f6]/90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             {#if isGenerating}
-                                <div class="flex items-center gap-1.5">
-                                    <div class="w-1.5 h-1.5 bg-[#6d28d9] rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                                    <div class="w-1.5 h-1.5 bg-[#6d28d9] rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                                    <div class="w-1.5 h-1.5 bg-[#6d28d9] rounded-full animate-bounce"></div>
+                                <div class="flex items-center gap-1">
+                                    <div class="w-1 h-1 bg-[#6d28d9] rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                                    <div class="w-1 h-1 bg-[#6d28d9] rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                                    <div class="w-1 h-1 bg-[#6d28d9] rounded-full animate-bounce"></div>
                                 </div>
-                                <span class="text-sm">Preparing Report...</span>
+                                <span class="text-xs">Preparing Report...</span>
                             {:else}
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-                                Generate Report
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                <span class="text-sm">Generate Report</span>
                             {/if}
                         </button>
                     </div>
@@ -556,13 +556,13 @@
                         <button 
                             onclick={bulkExport}
                             disabled={isBulkExporting || selectedTeamIds.length === 0}
-                            class="w-full bg-accent text-primary font-bold py-3 rounded-lg hover:bg-accent/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            class="w-full bg-accent text-primary font-bold py-2.5 rounded-lg hover:bg-accent/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             {#if isBulkExporting}
-                                <div class="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
-                                Exporting...
+                                <div class="w-3.5 h-3.5 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+                                <span class="text-sm">Exporting...</span>
                             {:else}
-                                Bulk Export
+                                <span class="text-sm">Bulk Export</span>
                             {/if}
                         </button>
                     </div>
@@ -570,19 +570,19 @@
             </div>
         </div>
 
-        <div class="p-6 border-t border-white/10 bg-black/20">
+        <div class="p-4 border-t border-white/10 bg-black/20">
             <button 
                 onclick={printReport}
                 class="w-full border border-white/20 hover:bg-white/5 text-white font-bold py-2 rounded-lg transition-all flex items-center justify-center gap-2"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                Print / Download
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                <span class="text-sm">Print / Download</span>
             </button>
         </div>
     </aside>
 
     <!-- Preview Area -->
-    <main class="flex-1 overflow-y-auto bg-gray-100 p-8 print:p-0 print:bg-white print:block print:h-auto print:overflow-visible">
+    <main class="flex-1 overflow-y-auto bg-gray-100 p-4 md:p-8 print:p-0 print:bg-white print:block print:h-auto print:overflow-visible">
         {#if errorMessage}
             <div class="max-w-5xl mx-auto mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
@@ -594,7 +594,7 @@
         {/if}
 
         {#if reportData && !isBulkExporting}
-            <div class="flex justify-center origin-top transform scale-[0.7] sm:scale-[0.85] xl:scale-100 transition-transform print:transform-none print:scale-100 print:block">
+            <div class="flex justify-center origin-top transform scale-[0.6] sm:scale-[0.8] lg:scale-[0.9] xl:scale-100 transition-all duration-300 print:transform-none print:scale-100 print:block">
                 <Report data={reportData} />
             </div>
         {:else if isGenerating || isBulkExporting}
