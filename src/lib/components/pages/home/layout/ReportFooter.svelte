@@ -1,17 +1,38 @@
 <script lang="ts">
-    let { pageNumber, totalPages, showDetails = false }: { pageNumber?: number, totalPages?: number, showDetails?: boolean } = $props();
+    import type { ReportData } from '$lib/scripts/types/report.types.js';
+
+    let { pageNumber, totalPages, showDetails = false, branding }: { 
+        pageNumber?: number, 
+        totalPages?: number, 
+        showDetails?: boolean,
+        branding?: ReportData['branding']
+    } = $props();
+
+    const spWebsite = $derived.by(() => {
+        if (!branding?.supportEmail) return '';
+        const domain = branding.supportEmail.split('@')[1];
+        return domain ? `www.${domain}` : '';
+    });
 </script>
 
 <footer class="mt-auto pt-6 border-t border-gray-100 flex justify-between items-end text-foreground/40 text-[9px] font-black uppercase tracking-[0.2em]">
     <div>
         <div class="flex items-center gap-3 mb-2">
-            <p class="text-primary font-black text-xs tracking-tighter">Wirespeed by Coalition</p>
+            <p class="text-primary font-black text-xs tracking-tighter">
+                {branding?.spName ? 'Powered by Wirespeed' : 'Wirespeed by Coalition'}
+            </p>
         </div>
         {#if showDetails}
             <p class="text-foreground/30 text-[9px] lowercase font-bold tracking-widest">
-                <a href="https://wirespeed.co" class="hover:text-primary transition-colors no-underline">wirespeed.co</a> 
-                <span class="mx-2 opacity-30">|</span> 
-                <a href="mailto:support@wirespeed.co" class="hover:text-primary transition-colors no-underline">support@wirespeed.co</a>
+                {#if branding?.spName && branding?.supportEmail}
+                    <a href="https://{spWebsite}" class="hover:text-primary transition-colors no-underline">{spWebsite}</a> 
+                    <span class="mx-2 opacity-30">|</span> 
+                    <a href="mailto:{branding.supportEmail}" class="hover:text-primary transition-colors no-underline">{branding.supportEmail}</a>
+                {:else}
+                    <a href="https://wirespeed.co" class="hover:text-primary transition-colors no-underline">wirespeed.co</a> 
+                    <span class="mx-2 opacity-30">|</span> 
+                    <a href="mailto:support@wirespeed.co" class="hover:text-primary transition-colors no-underline">support@wirespeed.co</a>
+                {/if}
             </p>
         {:else}
             <p class="opacity-50 font-bold">Confidential & Proprietary</p>

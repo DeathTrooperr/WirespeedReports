@@ -1,8 +1,65 @@
 export interface Team {
 	id: string;
 	name: string;
-	billableUsers?: number;
-	billableEndpoints?: number;
+	demo: boolean;
+	testMode: boolean;
+	chatOpsWelcomeMessage?: string;
+	platformName?: string;
+	maxChatOpsPerDay?: number;
+	maxAutoContainmentsPerDay?: number;
+	chatOpsEscalationDelayMinutes: number;
+	identityAutoContainment: boolean;
+	endpointAutoContainment: boolean;
+	escalationEmails: string[];
+	autoContainIdentityNHI: boolean;
+	autoContainIdentityVIP: boolean;
+	autoContainLSTEndpoint: boolean;
+	autoContainLOTLEndpoint: boolean;
+	autoContainEndpointHVA: boolean;
+	autoContainUnmitigatedMalware: boolean;
+	autoContainEndpointServers: boolean;
+	logoUrl: string;
+	chatOpsSecondFactor: boolean;
+	chatOpsAccountLockedMessage: string;
+	createdAt: string;
+	richCaseNotifications?: boolean;
+	escalationSubjectLine?: string;
+	vipChatOps: boolean;
+	managerChatOps: boolean;
+	emailSignature: string;
+	chatOpsSubjectLine: string;
+	notificationEscalationSeverity: 'INFORMATIONAL' | 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+	chatOpsWelcomeMessageInherited?: boolean;
+	emailSignatureInherited?: boolean;
+	chatOpsSubjectLineInherited?: boolean;
+	chatOpsAccountLockedMessageInherited?: boolean;
+	serviceProvider?: boolean;
+	parentTeamName?: string;
+	parentTeamId?: string;
+	operatingTeam?: boolean;
+	useChatOpsOnboardingGroup?: boolean;
+	chatOpsAllowBulkSmsInvite?: boolean;
+	billableUsers: number;
+	billableEndpoints: number;
+	supportEmail?: string;
+	address?: string;
+	autoSubscribeServiceProviderUsers: boolean;
+	orgId?: string;
+	logo?: string; // Legacy field retained if still used elsewhere
+}
+
+export interface PaginationDto {
+	size?: number;
+	page?: number;
+	filter?: string;
+	search?: string;
+	orderBy?: string;
+	orderDir?: 'asc' | 'desc';
+}
+
+export interface SearchTeam {
+	data: Team[];
+	totalCount: number;
 }
 
 export interface TeamStatisticsOperatingSystem {
@@ -175,6 +232,11 @@ export interface TeamStatistics {
 	detectionLocations: TeamStatisticsLocation[];
 	suspiciousLoginLocations: TeamStatisticsLocation[];
 	ocsfStatistics: TeamOCSFStatistic[];
+}
+
+export interface PlatformLogoResponse {
+	platformLogoLight: string;
+	platformLogoDark: string;
 }
 
 export interface SearchCasesDto {

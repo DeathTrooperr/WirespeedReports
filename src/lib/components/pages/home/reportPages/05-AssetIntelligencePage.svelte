@@ -10,6 +10,7 @@
     {pageNumber} 
     {totalPages}
     reportPeriodLabel={data.reportPeriodLabel}
+    branding={data.branding}
 >
     <ReportSection 
         title="Asset Analysis" 
@@ -90,8 +91,8 @@
                     </div>
                 {/each}
                 {#if data.mostAttackedEndpoints.length === 0}
-                    <div class="py-12 text-center bg-gray-50/30 rounded-2xl border border-dashed border-gray-200">
-                        <p class="text-[10px] font-black text-foreground/30 uppercase tracking-[0.2em] italic">No endpoint attacks detected</p>
+                    <div class="py-3 text-center bg-gray-50/30 rounded-xl border border-dashed border-gray-200">
+                        <p class="text-[10px] font-black text-foreground/30 px-2 py-0.5 uppercase tracking-[0.2em] italic">No endpoint attacks detected</p>
                     </div>
                 {/if}
             </div>

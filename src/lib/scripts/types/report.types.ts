@@ -1,4 +1,5 @@
 export type Severity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'INFORMATIONAL';
+export type Theme = 'light' | 'dark';
 
 export interface CaseSeverity {
     critical: number;
@@ -6,6 +7,19 @@ export interface CaseSeverity {
     medium: number;
     low: number;
     informational: number;
+}
+
+export interface Branding {
+    logo?: string;
+    logoLight?: string;
+    logoDark?: string;
+    theme?: Theme;
+    spName?: string;
+    supportEmail?: string;
+    colors?: {
+        primary?: string;
+        secondary?: string;
+    };
 }
 
 
@@ -50,6 +64,8 @@ export interface ReportData {
     reportPeriod: string;
     executiveSummary: string;
     
+    branding?: Branding;
+
     billableUsers: number;
     billableEndpoints: number;
     

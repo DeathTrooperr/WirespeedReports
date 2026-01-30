@@ -9,6 +9,7 @@
     {totalPages} 
     showFooterDetails={true}
     reportPeriodLabel={data.reportPeriodLabel}
+    branding={data.branding}
 >
     <div class="flex-grow flex flex-col justify-between py-24 px-12 text-center">
         <div class="mt-24">

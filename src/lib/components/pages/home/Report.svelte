@@ -76,9 +76,80 @@
 
     let totalCasePages = $derived(caseChunks.length);
     let totalPages = $derived(5 + totalCasePages);
+
+    function hexToHsl(hex: string): string {
+        hex = hex.replace(/^#/, '');
+        if (hex.length === 3) hex = hex.split('').map(s => s + s).join('');
+        
+        const r = parseInt(hex.substring(0, 2), 16) / 255;
+        const g = parseInt(hex.substring(2, 4), 16) / 255;
+        const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let h = 0, s, l = (max + min) / 2;
+
+        if (max === min) {
+            h = s = 0;
+        } else {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+        return `${(h * 360).toFixed(1)} ${(s * 100).toFixed(1)}% ${(l * 100).toFixed(1)}%`;
+    }
+
+    function getContrastColor(hex: string): string {
+        hex = hex.replace(/^#/, '');
+        if (hex.length === 3) hex = hex.split('').map(s => s + s).join('');
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+        const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+        return (yiq >= 128) ? '224 71.4% 4.1%' : '210 20% 98%'; // foreground vs primary-foreground roughly
+    }
+
+    let customStyles = $derived.by(() => {
+        let styles = '';
+        if (data.branding?.colors) {
+            const { primary } = data.branding.colors;
+            if (primary) {
+                try {
+                    const hsl = hexToHsl(primary);
+                    const contrast = getContrastColor(primary);
+                    // Update the raw variables that Tailwind uses via hsl()
+                    styles += `--primary: ${hsl}; --ring: ${hsl}; --chart-1: ${hsl}; --primary-foreground: ${contrast};`;
+                } catch (e) {
+                    console.error('Invalid primary color:', primary);
+                }
+            }
+        }
+        return styles;
+    });
+
+    // Directly apply styles to root when they change to ensure global CSS vars are updated
+    $effect(() => {
+        if (data.branding?.colors) {
+            const { primary } = data.branding.colors;
+            if (primary) {
+                try {
+                    const hsl = hexToHsl(primary);
+                    const contrast = getContrastColor(primary);
+                    document.documentElement.style.setProperty('--primary', hsl);
+                    document.documentElement.style.setProperty('--ring', hsl);
+                    document.documentElement.style.setProperty('--chart-1', hsl);
+                    document.documentElement.style.setProperty('--primary-foreground', contrast);
+                } catch (e) {}
+            }
+        }
+    });
 </script>
 
-<div class="bg-gray-100 py-10 print:p-0 print:bg-white">
+<div class="bg-gray-100 py-10 print:p-0 print:bg-white" style={customStyles}>
     <TitlePage {data} {totalPages} />
     
     <ExecutiveSummaryPage {data} {totalPages} />

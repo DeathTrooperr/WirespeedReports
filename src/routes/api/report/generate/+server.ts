@@ -13,21 +13,53 @@ import sanitizeHtml from 'sanitize-html';
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const body = (await request.json()) as {
-			apiKey?: string
+			apiKey?: string;
+			teamId?: string;
+			customColors?: {
+				primary?: string;
+				secondary?: string;
+			};
 			timeframe: {
-				startDate: string,
-				endDate: string,
-				periodLabel: string
-			}
+				startDate: string;
+				endDate: string;
+				periodLabel: string;
+			};
 		};
-		const { apiKey, timeframe } = body;
+		const { apiKey, timeframe, teamId, customColors } = body;
 		const { startDate, endDate, periodLabel } = timeframe;
 
 		if (!apiKey) {
 			return json({ error: 'API key is required' }, { status: 400 });
 		}
 
-		const api = new WirespeedApi(apiKey);
+		let api = new WirespeedApi(apiKey);
+		let branding: ReportData['branding'] = undefined;
+
+		try {
+			if (teamId) {
+				const [spTeam, logos] = await Promise.all([
+					api.getCurrentTeam(),
+					api.getPlatformLogos()
+				]);
+				const switchRes = await api.switchTeam(teamId);
+				api = new WirespeedApi(switchRes.accessToken);
+				branding = {
+					logo: spTeam.logoUrl || spTeam.logo,
+					logoLight: logos.platformLogoLight,
+					logoDark: logos.platformLogoDark,
+					spName: spTeam.name,
+					supportEmail: spTeam.supportEmail,
+					colors: customColors
+				};
+			}
+		} catch (brandingError: any) {
+			console.error('Error fetching branding info:', brandingError);
+			// Non-critical, continue without branding or return error if authentication failed
+			if (brandingError.message?.includes('401')) {
+				return json({ error: 'Authentication failed. Please check your API key.' }, { status: 401 });
+			}
+		}
+
 		const start = new Date(startDate);
 		const end = new Date(endDate);
 		const startDateString = start.toISOString();
@@ -36,29 +68,40 @@ export const POST: RequestHandler = async ({ request }) => {
 		const diffTime = Math.abs(end.getTime() - start.getTime());
 		const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
 
-		const [team, stats, severityStats, mttr, mttd, mttv, mttc, cases, detections] = await Promise.all([
-			api.getCurrentTeam(),
-			api.getTeamStatistics(days),
-			api.getCasesStatsBySeverity(days),
-			api.getMttr(days),
-			api.getMttd(days),
-			api.getMttv(days),
-			api.getMttc(days),
-			api.getCases({
-				orderBy: 'createdAt',
-				orderDir: 'desc',
-				createdAt: {
-					gte: startDateString
-				}
-			}),
-			api.getDetections({
-				orderBy: 'createdAt',
-				orderDir: 'desc',
-				createdAt: {
-					gte: startDateString
-				}
-			})
-		]);
+		let team, stats, severityStats, mttr, mttd, mttv, mttc, cases, detections;
+
+		try {
+			[team, stats, severityStats, mttr, mttd, mttv, mttc, cases, detections] = await Promise.all([
+				api.getCurrentTeam(),
+				api.getTeamStatistics(days),
+				api.getCasesStatsBySeverity(days),
+				api.getMttr(days),
+				api.getMttd(days),
+				api.getMttv(days),
+				api.getMttc(days),
+				api.getCases({
+					orderBy: 'createdAt',
+					orderDir: 'desc',
+					createdAt: {
+						gte: startDateString
+					}
+				}),
+				api.getDetections({
+					orderBy: 'createdAt',
+					orderDir: 'desc',
+					createdAt: {
+						gte: startDateString
+					}
+				})
+			]);
+		} catch (apiError: any) {
+			console.error('Wirespeed API error during report generation:', apiError);
+			return json({ 
+				error: apiError.message?.includes('401') 
+					? 'Invalid API key or session expired.' 
+					: 'Error retrieving security data from Wirespeed.' 
+			}, { status: 500 });
+		}
 
 		const detectionAssets = await Promise.all(detections.data.map((d) => api.getAssetsByDetectionId(d.id)));
 
@@ -125,6 +168,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			companyName: team.name,
 			reportPeriodLabel: periodLabel,
 			reportPeriod: `Last ${days} Days`,
+			branding,
 			executiveSummary:
 				`During the time frame of this report, <strong>Wirespeed analyzed</strong> <strong class="text-primary">${totalEvents.toLocaleString()}</strong> events from <strong class="text-primary">${stats.billableEndpoints}</strong> ` +
 				`<strong>endpoint${Number(stats.billableEndpoints) !== 1 ? 's' : ''}</strong>, <strong class="text-primary">${stats.billableUsers}</strong> <strong>user${Number(stats.billableUsers) !== 1 ? 's' : ''}</strong>, and ` +

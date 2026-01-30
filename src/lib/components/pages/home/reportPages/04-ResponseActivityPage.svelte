@@ -11,13 +11,14 @@
         totalPages: number
     } = $props();
 
-    const confirmationRate = Math.round((Number(data.verdictAccuracy.confirmedMalicious) / (Number(data.verdictAccuracy.verdictedMalicious) || 1)) * 100);
+    let confirmationRate = $derived(Math.round((Number(data.verdictAccuracy.confirmedMalicious) / (Number(data.verdictAccuracy.verdictedMalicious) || 1)) * 100));
 </script>
 
 <ReportPage 
     pageNumber={4 + index} 
     {totalPages}
     reportPeriodLabel={data.reportPeriodLabel}
+    branding={data.branding}
 >
     {#if index === 0}
     <ReportSection title="Verdict Accuracy" isMain={true}>
@@ -115,7 +116,7 @@
                                 <a 
                                     href="https://app.wirespeed.co/cases/{item.id}"
                                     target="_blank" 
-                                    class="text-[10px] font-black text-primary hover:underline transition-colors no-underline tracking-tighter"
+                                    class="text-[10px] font-black text-primary hover:underline transition-colors no-underline tracking-tighter print:underline"
                                 >
                                     #{item.sid}
                                 </a>
@@ -143,10 +144,10 @@
                                         <a 
                                             href="https://app.wirespeed.co/cases/{item.id}"
                                             target="_blank"
-                                            class="text-[8px] font-black text-primary hover:text-primary/80 transition-colors flex items-center gap-2 uppercase tracking-[0.2em] no-underline print:hidden"
+                                            class="text-[8px] font-black text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1 uppercase tracking-[0.2em] no-underline"
                                         >
                                             Details
-                                            <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-2.5 h-2.5 -mt-0.5 -ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                             </svg>
                                         </a>

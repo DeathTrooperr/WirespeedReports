@@ -10,6 +10,7 @@
     pageNumber={3} 
     {totalPages}
     reportPeriodLabel={data.reportPeriodLabel}
+    branding={data.branding}
 >
     <ReportSection title="Detection Analysis" isMain={true}>
         <div class="grid grid-cols-3 gap-6 mb-6">

@@ -8,22 +8,24 @@
         reportPeriodLabel,
         pageNumber,
         totalPages,
-        showFooterDetails = false
+        showFooterDetails = false,
+        branding
     }: { 
         children: Snippet, 
         reportPeriodLabel: string,
         pageNumber?: number,
         totalPages?: number,
-        showFooterDetails?: boolean
+        showFooterDetails?: boolean,
+        branding?: any
     } = $props();
 </script>
 
 <div class="a4-page page-break bg-linear-to-bl from-primary/5 via-white to-white">
-    <ReportHeader {reportPeriodLabel} />
+    <ReportHeader {reportPeriodLabel} {branding} />
     
     <div class="flex-grow flex flex-col">
         {@render children()}
     </div>
 
-    <ReportFooter {pageNumber} {totalPages} showDetails={showFooterDetails} />
+    <ReportFooter {pageNumber} {totalPages} showDetails={showFooterDetails} {branding} />
 </div>

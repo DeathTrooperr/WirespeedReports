@@ -10,6 +10,7 @@
     pageNumber={2} 
     {totalPages}
     reportPeriodLabel={data.reportPeriodLabel}
+    branding={data.branding}
 >
     <ReportSection title="Executive Summary" isMain={true}>
         <div class="relative">
@@ -52,7 +53,7 @@
             </div>
 
             <!-- Arrow -->
-            <div class="absolute top-1/2 left-[24%] -translate-y-1/2 -translate-x-1/2 z-10 hidden lg:block">
+            <div class="absolute top-1/2 left-[24%] -translate-y-1/2 -translate-x-1/2 z-10 hidden lg:block print:block">
                 <svg class="w-6 h-6 text-primary/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
                 </svg>
@@ -66,7 +67,7 @@
             </div>
 
             <!-- Arrow -->
-            <div class="absolute top-1/2 left-[50%] -translate-y-1/2 -translate-x-1/2 z-10 hidden lg:block">
+            <div class="absolute top-1/2 left-[50%] -translate-y-1/2 -translate-x-1/2 z-10 hidden lg:block print:block">
                 <svg class="w-6 h-6 text-primary/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
                 </svg>
@@ -80,7 +81,7 @@
             </div>
 
             <!-- Arrow -->
-            <div class="absolute top-1/2 left-[76%] -translate-y-1/2 -translate-x-1/2 z-10 hidden lg:block">
+            <div class="absolute top-1/2 left-[76%] -translate-y-1/2 -translate-x-1/2 z-10 hidden lg:block print:block">
                 <svg class="w-6 h-6 text-primary/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
                 </svg>

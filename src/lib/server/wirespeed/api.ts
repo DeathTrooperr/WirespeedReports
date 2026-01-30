@@ -6,6 +6,9 @@ import type {
 	Detections,
 	SearchCasesDto,
 	SearchDetectionsDto,
+	SearchTeam,
+	PaginationDto,
+	PlatformLogoResponse,
 	Team,
 	TeamStatistics,
 	TimeAverageAndChange
@@ -70,6 +73,26 @@ export class WirespeedApi {
 	}
 
 	/**
+	 * Search service provider teams
+	 */
+	async searchTeams(query: PaginationDto): Promise<SearchTeam> {
+		return this.request<SearchTeam>('/team', {
+			method: 'POST',
+			body: JSON.stringify(query)
+		});
+	}
+
+	/**
+	 * Switch to a different team
+	 */
+	async switchTeam(teamId: string): Promise<{ accessToken: string }> {
+		return this.request<{ accessToken: string }>('/team/switch', {
+			method: 'POST',
+			body: JSON.stringify({ teamId })
+		});
+	}
+
+	/**
 	 * Calculate mean time to resolution
 	 */
 	async getMttr(days: number): Promise<TimeAverageAndChange> {
@@ -126,6 +149,15 @@ export class WirespeedApi {
 		return this.request<Detections>('/detection', {
 			method: 'POST',
 			body: JSON.stringify(query)
+		});
+	}
+
+	/**
+	 * Get platform logos
+	 */
+	async getPlatformLogos(): Promise<PlatformLogoResponse> {
+		return this.request<PlatformLogoResponse>('/team/platform-logo', {
+			method: 'GET'
 		});
 	}
 

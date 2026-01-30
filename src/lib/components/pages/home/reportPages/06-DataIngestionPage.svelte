@@ -16,6 +16,7 @@
     {pageNumber} 
     {totalPages}
     reportPeriodLabel={data.reportPeriodLabel}
+    branding={data.branding}
 >
     <ReportSection 
         title="Ingestion Breakdown"
