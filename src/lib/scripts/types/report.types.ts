@@ -22,6 +22,14 @@ export interface Branding {
     };
 }
 
+export interface AppError {
+    message: string;
+    code?: string;
+    details?: string;
+    timestamp: string;
+    retryable?: boolean;
+}
+
 
 export interface IntegrationMetric {
     name: string;

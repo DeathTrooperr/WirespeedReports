@@ -1,8 +1,9 @@
-import { error } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { getReportData } from '$lib/server/report/logic.js';
 import puppeteer from '@cloudflare/puppeteer';
 import JSZip from 'jszip';
+import type { AppError } from '$lib/scripts/types/report.types.js';
 
 export const POST: RequestHandler = async ({ request, platform, url }) => {
 	const body = (await request.json()) as {
@@ -32,6 +33,7 @@ export const POST: RequestHandler = async ({ request, platform, url }) => {
 
 	const zip = new JSZip();
 	const browser = await puppeteer.launch(browserBinding);
+	const errors: { teamId: string, error: string }[] = [];
 
 	try {
 		for (const teamId of teamIds) {
@@ -64,10 +66,23 @@ export const POST: RequestHandler = async ({ request, platform, url }) => {
 				zip.file(fileName, pdf);
 				
 				await page.close();
-			} catch (err) {
+			} catch (err: any) {
 				console.error(`Error generating report for team ${teamId}:`, err);
+				errors.push({ teamId, error: err.message });
 				// Continue with other teams even if one fails
 			}
+		}
+
+		if (zip.files && Object.keys(zip.files).length === 0) {
+			return json({ 
+				error: {
+					message: 'Batch generation failed for all selected clients.',
+					code: 'BULK_GEN_FAILED',
+					details: errors.map(e => `${e.teamId}: ${e.error}`).join('\n'),
+					timestamp: new Date().toISOString(),
+					retryable: true
+				}
+			}, { status: 500 });
 		}
 
 		const zipContent = await zip.generateAsync({ type: 'uint8array' });
@@ -80,7 +95,15 @@ export const POST: RequestHandler = async ({ request, platform, url }) => {
 		});
 	} catch (err: any) {
 		console.error('Bulk generation error:', err);
-		throw error(500, `Bulk generation failed: ${err.message}`);
+		return json({ 
+			error: {
+				message: 'An unexpected error occurred during batch generation.',
+				code: 'BULK_GEN_CRITICAL_ERROR',
+				details: err.message,
+				timestamp: new Date().toISOString(),
+				retryable: true
+			}
+		}, { status: 500 });
 	} finally {
 		await browser.close();
 	}

@@ -2,7 +2,8 @@
     import { untrack } from 'svelte';
     import { fade, slide } from 'svelte/transition';
     import Report from '$lib/components/pages/home/Report.svelte';
-    import type { ReportData } from '$lib/scripts/types/report.types.js';
+    import ErrorReport from '$lib/components/ui/ErrorReport.svelte';
+    import type { ReportData, AppError } from '$lib/scripts/types/report.types.js';
     import type { Team } from '$lib/server/types/wirespeed.types.js';
 
     let mode = $state<'individual' | 'service-provider'>('individual');
@@ -99,7 +100,7 @@
     let selectedQuarter = $state(Math.floor(new Date().getMonth() / 3) + 1);
     let customStart = $state('');
     let customEnd = $state('');
-    let errorMessage = $state('');
+    let appError = $state<AppError | null>(null);
 
     const today = new Date().toISOString().slice(0, 10);
     const currentMonth = new Date().toISOString().slice(0, 7);
@@ -185,7 +186,7 @@
     async function fetchTeams() {
         if (!apiKey || apiKey === lastFetchedKey) return;
         isFetchingTeams = true;
-        errorMessage = '';
+        appError = null;
         try {
             const response = await fetch('/api/teams', {
                 method: 'POST',
@@ -198,12 +199,23 @@
                 mode = result.isServiceProvider ? 'service-provider' : 'individual';
                 lastFetchedKey = apiKey;
             } else {
-                const errorData = (await response.json()) as { error?: string };
-                errorMessage = errorData.error || 'Unable to fetch account details. Please verify your API key and try again.';
+                const errorData = (await response.json()) as { error?: AppError };
+                appError = errorData.error || {
+                    message: 'Unable to fetch account details. Please verify your API key and try again.',
+                    code: 'FETCH_TEAMS_ERROR',
+                    timestamp: new Date().toISOString(),
+                    retryable: true
+                };
                 mode = 'individual';
             }
-        } catch (e) {
-            errorMessage = 'A network error occurred while fetching account details. Please check your connection.';
+        } catch (e: any) {
+            appError = {
+                message: 'A network error occurred while fetching account details. Please check your connection.',
+                code: 'NETWORK_ERROR',
+                details: e.message,
+                timestamp: new Date().toISOString(),
+                retryable: true
+            };
             mode = 'individual';
         } finally {
             isFetchingTeams = false;
@@ -214,17 +226,27 @@
         const teamIdToUse = targetTeamId || (mode === 'service-provider' ? selectedTeamId : undefined);
 
         if (!apiKey) {
-            errorMessage = 'Please enter an API Key to generate the report.';
+            appError = {
+                message: 'Please enter an API Key to generate the report.',
+                code: 'MISSING_API_KEY',
+                timestamp: new Date().toISOString(),
+                retryable: false
+            };
             return;
         }
 
         if (mode === 'service-provider' && !teamIdToUse) {
-            errorMessage = 'Please select a client to generate the report for.';
+            appError = {
+                message: 'Please select a client to generate the report for.',
+                code: 'MISSING_CLIENT',
+                timestamp: new Date().toISOString(),
+                retryable: false
+            };
             return;
         }
 
         if (!targetTeamId) isGenerating = true;
-        errorMessage = '';
+        appError = null;
         
         try {
             const response = await fetch('/api/report/generate', {
@@ -253,12 +275,23 @@
                 }
                 return data;
             } else {
-                const errorData = (await response.json()) as { error?: string };
-                errorMessage = errorData.error || 'The report could not be generated. This may be due to missing data for the selected period.';
+                const errorData = (await response.json()) as { error?: AppError };
+                appError = errorData.error || {
+                    message: 'The report could not be generated. This may be due to missing data for the selected period.',
+                    code: 'GENERATE_REPORT_ERROR',
+                    timestamp: new Date().toISOString(),
+                    retryable: true
+                };
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error fetching report data:', error);
-            errorMessage = 'An unexpected error occurred while generating the report. Please try again later.';
+            appError = {
+                message: 'An unexpected error occurred while generating the report. Please try again later.',
+                code: 'UNEXPECTED_GEN_ERROR',
+                details: error.message,
+                timestamp: new Date().toISOString(),
+                retryable: true
+            };
         } finally {
             if (!targetTeamId) isGenerating = false;
         }
@@ -267,12 +300,17 @@
     let isBulkExporting = $state(false);
     async function bulkExport() {
         if (selectedTeamIds.length === 0) {
-            errorMessage = 'Please select at least one client for bulk export.';
+            appError = {
+                message: 'Please select at least one client for bulk export.',
+                code: 'NO_CLIENTS_SELECTED',
+                timestamp: new Date().toISOString(),
+                retryable: false
+            };
             return;
         }
 
         isBulkExporting = true;
-        errorMessage = '';
+        appError = null;
 
         try {
             const response = await fetch('/api/generate/bulk', {
@@ -301,12 +339,23 @@
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
             } else {
-                const errorData = (await response.json()) as { error?: string };
-                errorMessage = errorData.error || 'Failed to generate bulk reports.';
+                const errorData = (await response.json()) as { error?: AppError };
+                appError = errorData.error || {
+                    message: 'Failed to generate bulk reports.',
+                    code: 'BULK_GEN_ERROR',
+                    timestamp: new Date().toISOString(),
+                    retryable: true
+                };
             }
-        } catch (e) {
+        } catch (e: any) {
             console.error('Bulk export error:', e);
-            errorMessage = 'An unexpected error occurred during bulk export.';
+            appError = {
+                message: 'An unexpected error occurred during bulk export.',
+                code: 'UNEXPECTED_BULK_ERROR',
+                details: e.message,
+                timestamp: new Date().toISOString(),
+                retryable: true
+            };
         } finally {
             isBulkExporting = false;
         }
@@ -344,13 +393,26 @@
                 <div class="space-y-2">
                     <p class="text-[10px] font-black uppercase tracking-widest text-white/50">Account Mode</p>
                     <div class="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-lg border border-white/10 overflow-hidden relative min-h-[40px]">
-                        {#key mode}
-                            <div in:fade={{ duration: 300 }} class="absolute inset-x-4 flex items-center">
-                                <span class="text-[10px] font-black uppercase tracking-wider text-white">
-                                    {mode === 'service-provider' ? 'Service Provider' : 'Individual'}
+                        {#if isFetchingTeams}
+                            <div in:fade={{ duration: 200 }} class="absolute inset-x-4 flex items-center gap-2">
+                                <div class="flex items-center gap-1">
+                                    <div class="w-1 h-1 bg-white/40 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                                    <div class="w-1 h-1 bg-white/40 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                                    <div class="w-1 h-1 bg-white/40 rounded-full animate-bounce"></div>
+                                </div>
+                                <span class="text-[10px] font-black uppercase tracking-wider text-white/40 animate-pulse">
+                                    Fetching Details...
                                 </span>
                             </div>
-                        {/key}
+                        {:else}
+                            {#key mode}
+                                <div in:fade={{ duration: 300 }} class="absolute inset-x-4 flex items-center">
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-white">
+                                        {mode === 'service-provider' ? 'Service Provider' : 'Individual'}
+                                    </span>
+                                </div>
+                            {/key}
+                        {/if}
                     </div>
                 </div>
 
@@ -560,7 +622,7 @@
                                                     selectedTeamIds = selectedTeamIds.filter(id => id !== team.id);
                                                 }
                                             }}
-                                            class="rounded border-white/20 bg-transparent text-accent focus:ring-accent"
+                                            class="rounded border-white/20 bg-transparent text-accent focus:ring-accent cursor-pointer"
                                         />
                                         <span class="text-xs truncate">{team.name}</span>
                                     </label>
@@ -601,14 +663,8 @@
 
     <!-- Preview Area -->
     <main class="flex-1 overflow-y-auto bg-gray-100 p-4 md:p-8 print:p-0 print:bg-white print:block print:h-auto print:overflow-visible">
-        {#if errorMessage}
-            <div class="max-w-5xl mx-auto mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                <p class="text-sm font-medium">{errorMessage}</p>
-                <button onclick={() => errorMessage = ''} class="ml-auto hover:text-red-900 transition-colors" aria-label="Dismiss error">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
-            </div>
+        {#if appError}
+            <ErrorReport error={appError} onDismiss={() => appError = null} />
         {/if}
 
         {#if reportData && !isBulkExporting}
@@ -647,7 +703,7 @@
 
                 <div class="text-center space-y-3 max-w-md">
                     <h2 class="text-2xl font-black text-gray-900 tracking-tight">
-                        {isBulkExporting ? 'Generating Batch' : 'Compiling Intelligence'}
+                        {isBulkExporting ? 'Generating Report Batch' : 'Generating Client Report'}
                     </h2>
                     <div class="flex flex-col items-center gap-2">
                         <p class="text-sm text-gray-500 font-medium leading-relaxed">

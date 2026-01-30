@@ -28,11 +28,18 @@ export const POST: RequestHandler = async ({ request }) => {
 			return json(report);
 		} catch (apiError: any) {
 			console.error('Wirespeed API error during report generation:', apiError);
+			const isAuthError = apiError.message?.includes('401');
 			return json({ 
-				error: apiError.message?.includes('401') 
-					? 'Invalid API key or session expired.' 
-					: 'Error retrieving security data from Wirespeed.' 
-			}, { status: 500 });
+				error: {
+					message: isAuthError 
+						? 'Your session has expired or the API key is no longer valid.' 
+						: 'We were unable to aggregate security data for the selected period.',
+					code: isAuthError ? 'AUTH_EXPIRED' : 'DATA_FETCH_FAILED',
+					details: apiError.message,
+					timestamp: new Date().toISOString(),
+					retryable: true
+				}
+			}, { status: isAuthError ? 401 : 500 });
 		}
 	} catch (error) {
 		console.error('Error generating report:', error);

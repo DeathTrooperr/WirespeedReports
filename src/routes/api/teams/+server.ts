@@ -24,10 +24,18 @@ export const POST: RequestHandler = async ({ request }) => {
             ]);
         } catch (apiError: any) {
             console.error('Wirespeed API error in teams fetch:', apiError);
-            const message = apiError.message?.includes('401') 
-                ? 'Invalid API key. Please check your credentials.' 
-                : 'Could not connect to the Wirespeed API. Please try again later.';
-            return json({ error: message }, { status: apiError.status || 500 });
+            const isAuthError = apiError.message?.includes('401');
+            return json({ 
+                error: {
+                    message: isAuthError 
+                        ? 'The API key provided is invalid or has expired.' 
+                        : 'We encountered an issue connecting to the Wirespeed API.',
+                    code: isAuthError ? 'AUTH_FAILED' : 'CONNECTION_ERROR',
+                    details: apiError.message,
+                    timestamp: new Date().toISOString(),
+                    retryable: !isAuthError
+                }
+            }, { status: isAuthError ? 401 : 500 });
         }
         
         return json({
