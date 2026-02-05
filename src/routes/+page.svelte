@@ -86,6 +86,28 @@
                 return () => clearTimeout(timer);
             }
         }
+
+        // 3. Handle Automatic Compatibility Check (client-only to avoid SSR fetch)
+        if (typeof window !== 'undefined') {
+            const checkCompatibility = () => {
+                const ua = navigator.userAgent;
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+                const isSmallScreen = window.innerWidth < 1024;
+                isIncompatible = isMobile || isSmallScreen;
+            };
+
+            checkCompatibility();
+            window.addEventListener('resize', checkCompatibility);
+            return () => window.removeEventListener('resize', checkCompatibility);
+        }
+
+        // 4. Handle Automatic Disclaimer Check (client-only to avoid SSR fetch)
+        if (typeof window !== 'undefined') {
+            const dismissed = localStorage.getItem('wirespeed-disclaimer-dismissed');
+            if (!dismissed) {
+                showDisclaimer = true;
+            }
+        }
     });
 
     let apiKey = $state('');
@@ -106,21 +128,6 @@
     let appError = $state<AppError | null>(null);
     let isIncompatible = $state(false);
     let hidePoweredBy = $state(false);
-
-    $effect(() => {
-        if (typeof window !== 'undefined') {
-            const checkCompatibility = () => {
-                const ua = navigator.userAgent;
-                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
-                const isSmallScreen = window.innerWidth < 1024;
-                isIncompatible = isMobile || isSmallScreen;
-            };
-
-            checkCompatibility();
-            window.addEventListener('resize', checkCompatibility);
-            return () => window.removeEventListener('resize', checkCompatibility);
-        }
-    });
 
     const today = new Date().toISOString().slice(0, 10);
     const currentMonth = new Date().toISOString().slice(0, 7);
@@ -185,15 +192,6 @@
     let isGenerating = $state(false);
 
     let showDisclaimer = $state(false);
-
-    $effect(() => {
-        if (typeof window !== 'undefined') {
-            const dismissed = localStorage.getItem('wirespeed-disclaimer-dismissed');
-            if (!dismissed) {
-                showDisclaimer = true;
-            }
-        }
-    });
 
     function dismissDisclaimer() {
         showDisclaimer = false;

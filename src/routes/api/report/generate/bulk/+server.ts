@@ -1,9 +1,8 @@
 import { error, json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types.js';
+import type { RequestHandler } from '../../../../../../.svelte-kit/types/src/routes';
 import { getReportData } from '$lib/server/report/logic.js';
 import puppeteer from '@cloudflare/puppeteer';
 import JSZip from 'jszip';
-import type { AppError } from '$lib/scripts/types/report.types.js';
 
 export const POST: RequestHandler = async ({ request, platform, url }) => {
 	const body = (await request.json()) as {
