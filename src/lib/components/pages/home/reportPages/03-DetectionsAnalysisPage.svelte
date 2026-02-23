@@ -12,21 +12,21 @@
     reportPeriodLabel={data.reportPeriodLabel}
     branding={data.branding}
 >
-    <ReportSection title="Detections Analysis" isMain={true}>
-        <div class="grid grid-cols-3 gap-6 mb-6">
-                <div class="p-6 bg-white border border-gray-100 rounded-2xl shadow-sm relative overflow-hidden group">
+    <ReportSection title="Detections Analysis" isMain={true} mb="mb-5">
+        <div class="grid grid-cols-3 gap-5 mb-5">
+                <div class="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm relative overflow-hidden group">
                     <div class="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-bl-3xl"></div>
                     <p class="text-foreground/40 text-[10px] uppercase font-black tracking-[0.2em] mb-4">Total Detections</p>
                     <p class="text-2xl font-black text-primary tracking-tighter">{data.detections.total}</p>
                     <p class="text-foreground/50 text-[10px] mt-4 font-medium italic">Current reporting period</p>
                 </div>
-                <div class="p-6 bg-white border border-gray-100 rounded-2xl shadow-sm relative overflow-hidden group">
+                <div class="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm relative overflow-hidden group">
                     <div class="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-bl-3xl"></div>
                     <p class="text-foreground/40 text-[10px] uppercase font-black tracking-[0.2em] mb-4">Historic Avg</p>
                     <p class="text-2xl font-black text-foreground tracking-tighter">{data.detections.historic}</p>
                     <p class="text-foreground/50 text-[10px] mt-4 font-medium italic">90-day rolling average</p>
                 </div>
-                <div class="p-6 bg-emerald-50/50 border border-emerald-100 rounded-2xl relative overflow-hidden group">
+                <div class="p-5 bg-emerald-50/50 border border-emerald-100 rounded-2xl relative overflow-hidden group">
                     <div class="absolute top-0 right-0 w-16 h-16 bg-emerald-500/10 rounded-bl-3xl"></div>
                     <p class="text-emerald-700/60 text-[10px] uppercase font-black tracking-[0.2em] mb-4">Auto-Closed</p>
                     <p class="text-2xl font-black text-emerald-700 tracking-tighter">{data.detections.autoClosed}</p>
@@ -34,9 +34,9 @@
                 </div>
             </div>
 
-            <div class="bg-gray-50/50 border border-gray-100 rounded-3xl p-6 text-primary relative overflow-hidden">
+            <div class="bg-gray-50/50 border border-gray-100 rounded-3xl p-5 text-primary relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32"></div>
-                <h3 class="text-foreground/40 text-[10px] font-black uppercase tracking-[0.3em] mb-6 flex items-center gap-3">
+                <h3 class="text-foreground/40 text-[10px] font-black uppercase tracking-[0.3em] mb-5 flex items-center gap-3">
                     <span class="w-8 h-px bg-primary/30"></span>
                     Alert Processing Pipeline
                 </h3>
@@ -150,21 +150,21 @@
             </div>
         </ReportSection>
 
-        <ReportSection title="Historical Simulation (Test Mode)" mt="mt-6">
-            <div class="grid grid-cols-3 gap-6">
-                <div class="p-6 bg-white border border-gray-100 rounded-2xl shadow-sm relative overflow-hidden group">
+        <ReportSection title="Historical Simulation (Test Mode)" mt="mt-5" mb="mb-5">
+            <div class="grid grid-cols-3 gap-5">
+                <div class="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm relative overflow-hidden group">
                     <div class="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-bl-3xl transition-transform group-hover:scale-110"></div>
                     <p class="text-foreground/40 text-[10px] uppercase font-black tracking-[0.2em] mb-4">Would Escalate</p>
                     <p class="text-2xl font-black text-primary tracking-tighter">{data.potentialActions.wouldEscalate}</p>
                     <p class="text-foreground/50 text-[10px] mt-4 font-medium italic">Historic detections that would have been escalated</p>
                 </div>
-                <div class="p-6 bg-white border border-gray-100 rounded-2xl shadow-sm relative overflow-hidden group">
+                <div class="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm relative overflow-hidden group">
                     <div class="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-bl-3xl transition-transform group-hover:scale-110"></div>
                     <p class="text-foreground/40 text-[10px] uppercase font-black tracking-[0.2em] mb-4">Would Chat Ops</p>
                     <p class="text-2xl font-black text-primary tracking-tighter">{data.potentialActions.wouldChatOps}</p>
                     <p class="text-foreground/50 text-[10px] mt-4 font-medium italic">Historic detections that would have resulted in chat ops</p>
                 </div>
-                <div class="p-6 bg-white border border-gray-100 rounded-2xl shadow-sm relative overflow-hidden group">
+                <div class="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm relative overflow-hidden group">
                     <div class="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-bl-3xl transition-transform group-hover:scale-110"></div>
                     <p class="text-foreground/40 text-[10px] uppercase font-black tracking-[0.2em] mb-4">Would Contain</p>
                     <p class="text-2xl font-black text-primary tracking-tighter">{data.potentialActions.wouldContain}</p>

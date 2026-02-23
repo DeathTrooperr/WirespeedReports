@@ -12,7 +12,7 @@
     reportPeriodLabel={data.reportPeriodLabel}
     branding={data.branding}
 >
-    <ReportSection title="Executive Summary" isMain={true}>
+    <ReportSection title="Executive Summary" isMain={true} mb="mb-5">
         <div class="relative">
             <p class="text-foreground/80 leading-relaxed text-sm whitespace-pre-line pl-0">
                 {@html data.executiveSummary}
@@ -20,9 +20,9 @@
         </div>
     </ReportSection>
 
-    <ReportSection title="Service Scope & Coverage">
-        <div class="grid grid-cols-2 gap-6">
-            <div class="p-6 bg-white border border-gray-100 rounded-2xl shadow-sm relative overflow-hidden group transition-all hover:shadow-md">
+    <ReportSection title="Service Scope & Coverage" mt="mt-5" mb="mb-5">
+        <div class="grid grid-cols-2 gap-5">
+            <div class="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm relative overflow-hidden group transition-all hover:shadow-md">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
                 <p class="text-foreground/40 text-[10px] uppercase font-black tracking-[0.2em] mb-4">Protected Identities</p>
                 <div class="flex items-baseline gap-3">
@@ -43,9 +43,9 @@
         </div>
     </ReportSection>
 
-    <ReportSection title="Performance Metrics">
+    <ReportSection title="Performance Metrics" mt="mt-5" mb="mb-5">
         <div class="grid grid-cols-4 gap-6 relative">
-            <div class="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group hover:border-primary/20 transition-colors">
+            <div class="p-5 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group flex flex-col justify-center items-center">
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-primary"></div>
                 <p class="text-foreground/40 text-[9px] uppercase font-black mb-2 tracking-[0.2em]">MTTD</p>
                 <p class="text-2xl font-black text-primary tracking-tighter">{data.meanTimeMetrics.mttd}</p>
@@ -59,7 +59,7 @@
                 </svg>
             </div>
 
-            <div class="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group hover:border-primary/20 transition-colors">
+            <div class="p-5 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group flex flex-col justify-center items-center">
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-primary"></div>
                 <p class="text-foreground/40 text-[9px] uppercase font-black mb-2 tracking-[0.2em]">MTTV</p>
                 <p class="text-2xl font-black text-primary tracking-tighter">{data.meanTimeMetrics.mttv}</p>
@@ -73,7 +73,7 @@
                 </svg>
             </div>
 
-            <div class="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group hover:border-primary/20 transition-colors">
+            <div class="p-5 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group flex flex-col justify-center items-center">
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-primary"></div>
                 <p class="text-foreground/40 text-[9px] uppercase font-black mb-2 tracking-[0.2em]">MTTC</p>
                 <p class="text-2xl font-black text-primary tracking-tighter">{data.meanTimeMetrics.mttc || "N/A"}</p>
@@ -87,7 +87,7 @@
                 </svg>
             </div>
 
-            <div class="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group hover:border-primary/20 transition-colors">
+            <div class="p-5 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group flex flex-col justify-center items-center">
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-primary"></div>
                 <p class="text-foreground/40 text-[9px] uppercase font-black mb-2 tracking-[0.2em]">MTTR</p>
                 <p class="text-2xl font-black text-primary tracking-tighter">{data.meanTimeMetrics.mttr}</p>
@@ -96,7 +96,7 @@
         </div>
     </ReportSection>
 
-    <ReportSection title="Cases by Severity">
+    <ReportSection title="Cases by Severity" mt="mt-5" mb="mb-5">
         <div class="grid grid-cols-5 gap-4">
             <div class="text-center p-5 rounded-2xl bg-white border border-red-100 shadow-sm relative overflow-hidden">
                 <div class="absolute top-0 left-0 right-0 h-1 bg-red-500"></div>

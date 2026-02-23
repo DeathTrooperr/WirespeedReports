@@ -121,12 +121,12 @@
                             <div>
                                 <p class="text-[7px] uppercase font-black text-foreground/40 tracking-widest">{stat.category}</p>
                                 <p class="text-lg font-black text-primary tracking-tighter leading-none">
-                                    {stat.percentage.toFixed(1)}%
+                                    {stat.percentage?.toFixed(1) || 0}%
                                 </p>
                             </div>
                             <div class="text-right">
                                 <p class="text-[8px] text-foreground/50 font-medium">
-                                    {stat.count.toLocaleString()} <span class="text-[7px] uppercase font-bold opacity-70">Detections</span>
+                                    {stat.count?.toLocaleString() || 0} <span class="text-[7px] uppercase font-bold opacity-70">Detections</span>
                                 </p>
                             </div>
                         </div>

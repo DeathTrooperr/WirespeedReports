@@ -121,23 +121,23 @@ export async function getReportData(apiKey: string, timeframe: { startDate: stri
     ]);
 
     const credentialCases = {
-        data: [...privateCredentialCases.data, ...publicCredentialCases.data].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
-        totalCount: privateCredentialCases.totalCount + publicCredentialCases.totalCount
+        data: [...(privateCredentialCases?.data || []), ...(publicCredentialCases?.data || [])].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+        totalCount: (privateCredentialCases?.totalCount || 0) + (publicCredentialCases?.totalCount || 0)
     };
 
-    const detectionAssets = await Promise.all(detections.data.map((d) => api.getAssetsByDetectionId(d.id)));
+    const detectionAssets = await Promise.all((detections?.data || []).map((d) => api.getAssetsByDetectionId(d.id)));
 
-    const totalEvents = stats.ocsfStatistics.reduce((acc, curr) => acc + Number(curr.totalEvents), 0);
+    const totalEvents = (stats?.ocsfStatistics || []).reduce((acc, curr) => acc + Number(curr?.totalEvents || 0), 0);
 
     const endpointsMap: Record<string, number> = {};
     const identitiesMap: Record<string, number> = {};
 
     detectionAssets.forEach((assets) => {
-        assets.endpoints.forEach((e) => {
+        (assets?.endpoints || []).forEach((e) => {
             const endpoint = e.displayName || e.name;
             if (endpoint) endpointsMap[endpoint] = (endpointsMap[endpoint] || 0) + 1;
         });
-        assets.directory.forEach((u) => {
+        (assets?.directory || []).forEach((u) => {
             const identity = u.displayName || u.email;
             if (identity && u.directoryId) identitiesMap[identity] = (identitiesMap[identity] || 0) + 1;
         });
@@ -154,70 +154,70 @@ export async function getReportData(apiKey: string, timeframe: { startDate: stri
         .slice(0, 5);
 
     const report: ReportData = {
-        companyName: team.name,
-        reportPeriodLabel: periodLabel,
+        companyName: team?.name || 'Unknown Team',
+        reportPeriodLabel: periodLabel || '',
         reportPeriod: `Last ${days} Days`,
-        branding,
+        branding: branding || undefined,
         executiveSummary:
-            `During the time frame of this report, <strong>Wirespeed analyzed</strong> <strong class="text-primary">${totalEvents.toLocaleString()}</strong> events from <strong class="text-primary">${stats.billableEndpoints}</strong> ` +
-            `<strong>endpoint${Number(stats.billableEndpoints) !== 1 ? 's' : ''}</strong>, <strong class="text-primary">${stats.billableUsers}</strong> <strong>user${Number(stats.billableUsers) !== 1 ? 's' : ''}</strong>, and ` +
-            `<strong>other sources</strong> in your environment. Of those events, <strong class="text-primary">${stats.totalDetections}</strong> <strong> triggered detections</strong> through automated rules and ` +
-            `dynamic analysis. Of those detections, <strong>Wirespeed & integrated security tools</strong> automatically resolved <strong class="text-primary">${stats.automaticallyClosed}</strong> and escalated ` +
-            `<strong class="text-primary">${stats.escalatedDetections}</strong> case to your security team. Those cases led to <strong>${Number((stats.chatOpsDetections + stats.containmentDetections))}</strong> response actions ` +
-            `which were taken to stop further compromise by your security team. This defense strategy continues to reduce your risk, which maximizes your security and minimizes cyberattack damage to your business.`,
-        billableUsers: stats.billableUsers,
-        billableEndpoints: stats.billableEndpoints,
+            `During the time frame of this report, <strong>Wirespeed analyzed</strong> <strong class="text-primary">${(totalEvents || 0).toLocaleString()}</strong> events from <strong class="text-primary">${stats?.billableEndpoints || 0}</strong> ` +
+            `<strong>endpoint${Number(stats?.billableEndpoints || 0) !== 1 ? 's' : ''}</strong>, <strong class="text-primary">${stats?.billableUsers || 0}</strong> <strong>user${Number(stats?.billableUsers || 0) !== 1 ? 's' : ''}</strong>, and ` +
+            `<strong>other sources</strong> in your environment. Of those events, <strong class="text-primary">${stats?.totalDetections || 0}</strong> <strong> triggered detections</strong> through automated rules and ` +
+            `dynamic analysis. Of those detections, <strong>Wirespeed & integrated security tools</strong> automatically resolved <strong class="text-primary">${stats?.automaticallyClosed || 0}</strong> and escalated ` +
+            `<strong class="text-primary">${stats?.escalatedDetections || 0}</strong> cases to your security team. Those cases led to <strong>${Number((stats?.chatOpsDetections || 0) + (stats?.containmentDetections || 0)) || "no"}</strong> response actions ` +
+            `required to stop further compromise by your security team. This defense strategy continues to reduce your risk, which maximizes your security and minimizes cyberattack damage to your business.`,
+        billableUsers: stats?.billableUsers || 0,
+        billableEndpoints: stats?.billableEndpoints || 0,
 
         detections: {
-            total: stats.totalDetections,
-            historic: stats.historicDetections,
-            escalated: stats.escalatedDetections,
+            total: stats?.totalDetections || 0,
+            historic: stats?.historicDetections || 0,
+            escalated: stats?.escalatedDetections || 0,
             escalatedPercent:
-                stats.totalDetections > 0
-                    ? `${((stats.escalatedDetections / stats.totalDetections) * 100).toFixed(2)}%`
+                (stats?.totalDetections || 0) > 0
+                    ? `${(((stats?.escalatedDetections || 0) / (stats?.totalDetections || 1)) * 100).toFixed(2)}%`
                     : '0%',
-            chatOps: stats.chatOpsDetections,
+            chatOps: stats?.chatOpsDetections || 0,
             chatOpsPercent:
-                stats.totalDetections > 0
-                    ? `${((stats.chatOpsDetections / stats.totalDetections) * 100).toFixed(2)}%`
+                (stats?.totalDetections || 0) > 0
+                    ? `${(((stats?.chatOpsDetections || 0) / (stats?.totalDetections || 1)) * 100).toFixed(2)}%`
                     : '0%',
-            containment: stats.containmentDetections,
+            containment: stats?.containmentDetections || 0,
             containmentPercent:
-                stats.totalDetections > 0
-                    ? `${((stats.containmentDetections / stats.totalDetections) * 100).toFixed(2)}%`
+                (stats?.totalDetections || 0) > 0
+                    ? `${(((stats?.containmentDetections || 0) / (stats?.totalDetections || 1)) * 100).toFixed(2)}%`
                     : '0%',
-            autoClosed: stats.automaticallyClosed
+            autoClosed: stats?.automaticallyClosed || 0
         },
 
         verdictAccuracy: {
-            verdictedMalicious: stats.verdictedMalicious,
-            confirmedMalicious: stats.confirmedMalicious,
-            truePositives: stats.truePositiveDetections,
+            verdictedMalicious: stats?.verdictedMalicious || 0,
+            confirmedMalicious: stats?.confirmedMalicious || 0,
+            truePositives: stats?.truePositiveDetections || 0,
             truePositivesPercent:
-                stats.escalatedDetections > 0
-                    ? `${((stats.truePositiveDetections / stats.escalatedDetections) * 100).toFixed(2)}%`
+                (stats?.escalatedDetections || 0) > 0
+                    ? `${(((stats?.truePositiveDetections || 0) / (stats?.escalatedDetections || 1)) * 100).toFixed(2)}%`
                     : '0%',
-            falsePositives: stats.falsePositiveDetections,
+            falsePositives: stats?.falsePositiveDetections || 0,
             falsePositivesPercent:
-                stats.escalatedDetections > 0
-                    ? `${((stats.falsePositiveDetections / stats.escalatedDetections) * 100).toFixed(2)}%`
+                (stats?.escalatedDetections || 0) > 0
+                    ? `${(((stats?.falsePositiveDetections || 0) / (stats?.escalatedDetections || 1)) * 100).toFixed(2)}%`
                     : '0%'
         },
 
         potentialActions: {
-            wouldEscalate: stats.potentialEscalatedDetections,
-            wouldChatOps: stats.potentialChatOpsDetections,
-            wouldContain: stats.potentialContainmentDetections
+            wouldEscalate: stats?.potentialEscalatedDetections || 0,
+            wouldChatOps: stats?.potentialChatOpsDetections || 0,
+            wouldContain: stats?.potentialContainmentDetections || 0
         },
 
-        eventsByIntegration: stats.ocsfStatistics.map((s: any) => ({
-            name: s.integration.config.name,
-            processed: `${(s.totalBytes / 1024 / 1024).toFixed(2)} MB`,
-            count: s.totalEvents.toLocaleString(),
-            countValue: Number(s.totalEvents)
+        eventsByIntegration: (stats?.ocsfStatistics || []).map((s: any) => ({
+            name: s?.integration?.config?.name || 'Unknown Integration',
+            processed: `${((s?.totalBytes || 0) / 1024 / 1024).toFixed(2)} MB`,
+            count: (s?.totalEvents || 0).toLocaleString(),
+            countValue: Number(s?.totalEvents || 0)
         })),
 
-        endpointsByOS: stats.operatingSystems.reduce(
+        endpointsByOS: (stats?.operatingSystems || []).reduce(
             (acc: EndpointOS, { operatingSystem, count }: any) => {
                 const name = (operatingSystem ?? '').toLowerCase();
                 const n = Number(count) || 0;
@@ -233,54 +233,54 @@ export async function getReportData(apiKey: string, timeframe: { startDate: stri
             { windows: 0, macos: 0, linux: 0, mobile: 0, other: 0 } as EndpointOS
         ),
 
-        mostAttackedEndpoints,
-        mostAttackedIdentities,
+        mostAttackedEndpoints: mostAttackedEndpoints || [],
+        mostAttackedIdentities: mostAttackedIdentities || [],
 
         meanTimeMetrics: {
-            mttr: formatTimeMetric(mttr),
-            mttd: formatTimeMetric(mttd),
-            mttv: formatTimeMetric(mttv),
-            mttc: formatTimeMetric(mttc),
+            mttr: formatTimeMetric(mttr || { average: 0, unit: 'seconds' }),
+            mttd: formatTimeMetric(mttd || { average: 0, unit: 'seconds' }),
+            mttv: formatTimeMetric(mttv || { average: 0, unit: 'seconds' }),
+            mttc: formatTimeMetric(mttc || { average: 0, unit: 'seconds' }),
         },
 
         funnelData: {
-            total: totalEvents,
-            detections: stats.totalDetections,
-            cases: stats.escalatedDetections,
-            responded: Number(stats.chatOpsDetections + stats.containmentDetections)
+            total: totalEvents || 0,
+            detections: stats?.totalDetections || 0,
+            cases: stats?.escalatedDetections || 0,
+            responded: Number((stats?.chatOpsDetections || 0) + (stats?.containmentDetections || 0))
         },
 
         casesBySeverity: {
-            critical: severityStats.find((s) => s.severity === 'CRITICAL')?.count ?? 0,
-            high: severityStats.find((s) => s.severity === 'HIGH')?.count ?? 0,
-            medium: severityStats.find((s) => s.severity === 'MEDIUM')?.count ?? 0,
-            low: severityStats.find((s) => s.severity === 'LOW')?.count ?? 0,
-            informational: severityStats.find((s) => s.severity === 'INFORMATIONAL')?.count ?? 0
+            critical: severityStats?.find((s) => s.severity === 'CRITICAL')?.count ?? 0,
+            high: severityStats?.find((s) => s.severity === 'HIGH')?.count ?? 0,
+            medium: severityStats?.find((s) => s.severity === 'MEDIUM')?.count ?? 0,
+            low: severityStats?.find((s) => s.severity === 'LOW')?.count ?? 0,
+            informational: severityStats?.find((s) => s.severity === 'INFORMATIONAL')?.count ?? 0
         },
 
-        suspiciousLoginLocations: stats.suspiciousLoginLocations
+        suspiciousLoginLocations: (stats?.suspiciousLoginLocations || [])
             .reduce((acc: TeamStatisticsLocation[], l: TeamStatisticsLocation) => {
                 acc.push(l);
-                return acc.sort((a, b) => b.count - a.count).slice(0, 10);
+                return acc.sort((a, b) => (b.count || 0) - (a.count || 0)).slice(0, 10);
             }, [])
             .map((l: TeamStatisticsLocation) => ({
-                country: l.country,
-                count: l.count
+                country: l.country || 'Unknown',
+                count: l.count || 0
             })),
 
-        integrations: integrationsRes.data.map((i) => ({
+        integrations: (integrationsRes?.data || []).map((i) => ({
             name: (i.platform == "generic-json" || i.platform == "generic-syslog") ? i.identityFields?.label as string : i.config?.name || i.platform,
             types: getIntegrationTypes(i.config?.description),
-            platform: String(i.platform),
+            platform: String(i.platform || ''),
             enabled: Boolean(i.enabled),
             logo: i.config?.logoLight || i.config?.logo
         })).filter(i => !["have-i-been-pwned", "ipinfo", "reversing-labs", "wirespeed" ,"sms", "slack", "email", "microsoft-teams"].includes(i.platform)),
 
-        detectionStatsByCategoryClass: detectionStatsByCategoryClass.map(c => ({
-            categoryClass: c.categoryClass,
-            displayName: c.displayName,
-            count: c.count,
-            percentage: c.percentage
+        detectionStatsByCategoryClass: (detectionStatsByCategoryClass || []).map(c => ({
+            categoryClass: c.categoryClass || 'OTHER',
+            displayName: c.displayName || 'Other',
+            count: c.count || 0,
+            percentage: c.percentage || 0
         })),
 
         mappedDetectionStats: ((): Array<{ category: string, percentage: number, count: number }> => {
@@ -294,10 +294,10 @@ export async function getReportData(apiKey: string, timeframe: { startDate: stri
                 { key: 'other', label: 'Other' }
             ];
             
-            const totalDetections = stats.totalDetections || 1;
+            const totalDetections = stats?.totalDetections || 1;
             
             return fixedCategories.map(cat => {
-                const found = detectionStatsByCategoryClass.find(
+                const found = (detectionStatsByCategoryClass || []).find(
                     s => s.categoryClass?.toLowerCase() === cat.key.toLowerCase() || 
                          s.displayName?.toLowerCase() === cat.label.toLowerCase()
                 );
@@ -319,7 +319,7 @@ export async function getReportData(apiKey: string, timeframe: { startDate: stri
                 INFORMATIONAL: 4
             };
 
-            return cases.data
+            return (cases?.data || [])
                 .sort((a, b) => {
                     const aOrder = severityOrder[a.severity] ?? 99;
                     const bOrder = severityOrder[b.severity] ?? 99;
@@ -327,24 +327,24 @@ export async function getReportData(apiKey: string, timeframe: { startDate: stri
                 })
                 .slice(0, 10)
                 .map((c: Case) => ({
-                    id: c.id,
-                    sid: c.sid,
+                    id: c.id || '',
+                    sid: c.sid || '',
                     title: sanitizeText(c.title),
-                    severity: c.severity as Severity,
-                    status: c.status,
-                    createdAt: c.createdAt,
+                    severity: (c.severity || 'INFORMATIONAL') as Severity,
+                    status: c.status || 'CLOSED',
+                    createdAt: c.createdAt || new Date().toISOString(),
                     response: sanitizeText(c.summary || c.notes || 'Investigated and triaged by Wirespeed MDR.')
                 }));
         })(),
 
         darkWebReport: {
-            totalExposures: credentialCases.totalCount,
-            highRiskExposures: credentialCases.data.filter(c => c.severity === 'HIGH' || c.severity === 'CRITICAL').length,
-            compromisedAccounts: credentialCases.data.length, // Each case is typically an exposure
-            recentLeaks: credentialCases.data.slice(0, 5).map(c => ({
-                date: new Date(c.createdAt).toISOString().slice(0, 10),
+            totalExposures: credentialCases.totalCount || 0,
+            highRiskExposures: (credentialCases.data || []).filter(c => c.severity === 'HIGH' || c.severity === 'CRITICAL').length,
+            compromisedAccounts: (credentialCases.data || []).length, // Each case is typically an exposure
+            recentLeaks: (credentialCases.data || []).slice(0, 5).map(c => ({
+                date: new Date(c.createdAt || Date.now()).toISOString().slice(0, 10),
                 source: c.platforms?.[0] || 'Web Leak',
-                type: c.title,
+                type: c.title || 'Unknown Exposure',
                 severity: (c.severity === 'CRITICAL' || c.severity === 'HIGH') ? 'HIGH' : (c.severity === 'MEDIUM' ? 'MEDIUM' : 'LOW') as 'HIGH' | 'MEDIUM' | 'LOW'
             }))
         }
