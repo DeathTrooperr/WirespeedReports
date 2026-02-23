@@ -34,9 +34,9 @@ function formatTimeMetric(metric: { average: number | string; unit: string }) {
     } else if (ms < 3600000) {
         return `${(ms / 60000).toFixed(1)}m`;
     } else if (ms < 86400000) {
-        return `${(ms / 3600000).toFixed(1)} hour${ms === 3600000 ? '' : 's'}`;
+        return `${(ms / 3600000).toFixed(1)}h`;
     } else {
-        return `${(ms / 86400000).toFixed(1)} day${ms === 86400000 ? '' : 's'}`;
+        return `${(ms / 86400000).toFixed(1)}d`;
     }
 }
 
@@ -163,7 +163,7 @@ export async function getReportData(apiKey: string, timeframe: { startDate: stri
             `<strong>endpoint${Number(stats?.billableEndpoints || 0) !== 1 ? 's' : ''}</strong>, <strong class="text-primary">${stats?.billableUsers || 0}</strong> <strong>user${Number(stats?.billableUsers || 0) !== 1 ? 's' : ''}</strong>, and ` +
             `<strong>other sources</strong> in your environment. Of those events, <strong class="text-primary">${stats?.totalDetections || 0}</strong> <strong> triggered detections</strong> through automated rules and ` +
             `dynamic analysis. Of those detections, <strong>Wirespeed & integrated security tools</strong> automatically resolved <strong class="text-primary">${stats?.automaticallyClosed || 0}</strong> and escalated ` +
-            `<strong class="text-primary">${stats?.escalatedDetections || 0}</strong> cases to your security team. Those cases led to <strong>${Number((stats?.chatOpsDetections || 0) + (stats?.containmentDetections || 0)) || "no"}</strong> response actions ` +
+            `<strong class="text-primary">${stats?.escalatedDetections || 0}</strong> case${stats?.escalatedDetections == 0 ? "s" : ""} to your security team. Those cases led to <strong>${Number((stats?.chatOpsDetections || 0) + (stats?.containmentDetections || 0)) || "no"}</strong> response actions ` +
             `required to stop further compromise by your security team. This defense strategy continues to reduce your risk, which maximizes your security and minimizes cyberattack damage to your business.`,
         billableUsers: stats?.billableUsers || 0,
         billableEndpoints: stats?.billableEndpoints || 0,

@@ -20,7 +20,7 @@
         </div>
     </ReportSection>
 
-    <ReportSection title="Service Scope & Coverage" mt="mt-5" mb="mb-5">
+    <ReportSection title="Service Scope & Coverage" mt="mt-6" mb="mb-6">
         <div class="grid grid-cols-2 gap-5">
             <div class="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm relative overflow-hidden group transition-all hover:shadow-md">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
@@ -43,9 +43,9 @@
         </div>
     </ReportSection>
 
-    <ReportSection title="Performance Metrics" mt="mt-5" mb="mb-5">
+    <ReportSection title="Performance Metrics" mt="mt-6" mb="mb-6">
         <div class="grid grid-cols-4 gap-6 relative">
-            <div class="p-5 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group flex flex-col justify-center items-center">
+            <div class="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group flex flex-col justify-center items-center">
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-primary"></div>
                 <p class="text-foreground/40 text-[9px] uppercase font-black mb-2 tracking-[0.2em]">MTTD</p>
                 <p class="text-2xl font-black text-primary tracking-tighter">{data.meanTimeMetrics.mttd}</p>
@@ -59,7 +59,7 @@
                 </svg>
             </div>
 
-            <div class="p-5 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group flex flex-col justify-center items-center">
+            <div class="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group flex flex-col justify-center items-center">
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-primary"></div>
                 <p class="text-foreground/40 text-[9px] uppercase font-black mb-2 tracking-[0.2em]">MTTV</p>
                 <p class="text-2xl font-black text-primary tracking-tighter">{data.meanTimeMetrics.mttv}</p>
@@ -73,7 +73,7 @@
                 </svg>
             </div>
 
-            <div class="p-5 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group flex flex-col justify-center items-center">
+            <div class="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group flex flex-col justify-center items-center">
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-primary"></div>
                 <p class="text-foreground/40 text-[9px] uppercase font-black mb-2 tracking-[0.2em]">MTTC</p>
                 <p class="text-2xl font-black text-primary tracking-tighter">{data.meanTimeMetrics.mttc || "N/A"}</p>
@@ -87,7 +87,7 @@
                 </svg>
             </div>
 
-            <div class="p-5 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group flex flex-col justify-center items-center">
+            <div class="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 text-center relative overflow-hidden group flex flex-col justify-center items-center">
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-primary"></div>
                 <p class="text-foreground/40 text-[9px] uppercase font-black mb-2 tracking-[0.2em]">MTTR</p>
                 <p class="text-2xl font-black text-primary tracking-tighter">{data.meanTimeMetrics.mttr}</p>
@@ -96,29 +96,29 @@
         </div>
     </ReportSection>
 
-    <ReportSection title="Cases by Severity" mt="mt-5" mb="mb-5">
+    <ReportSection title="Cases by Severity" mt="mt-6" mb="mb-6">
         <div class="grid grid-cols-5 gap-4">
-            <div class="text-center p-5 rounded-2xl bg-white border border-red-100 shadow-sm relative overflow-hidden">
+            <div class="text-center p-6 rounded-2xl bg-white border border-red-100 shadow-sm relative overflow-hidden">
                 <div class="absolute top-0 left-0 right-0 h-1 bg-red-500"></div>
                 <p class="text-[9px] uppercase font-black text-red-600 mb-2 tracking-widest">Critical</p>
                 <p class="text-2xl font-black text-red-700 tracking-tighter">{data.casesBySeverity.critical}</p>
             </div>
-            <div class="text-center p-5 rounded-2xl bg-white border border-orange-100 shadow-sm relative overflow-hidden">
+            <div class="text-center p-6 rounded-2xl bg-white border border-orange-100 shadow-sm relative overflow-hidden">
                 <div class="absolute top-0 left-0 right-0 h-1 bg-orange-500"></div>
                 <p class="text-[9px] uppercase font-black text-orange-600 mb-2 tracking-widest">High</p>
                 <p class="text-2xl font-black text-orange-700 tracking-tighter">{data.casesBySeverity.high}</p>
             </div>
-            <div class="text-center p-5 rounded-2xl bg-white border border-amber-100 shadow-sm relative overflow-hidden">
+            <div class="text-center p-6 rounded-2xl bg-white border border-amber-100 shadow-sm relative overflow-hidden">
                 <div class="absolute top-0 left-0 right-0 h-1 bg-amber-500"></div>
                 <p class="text-[9px] uppercase font-black text-amber-600 mb-2 tracking-widest">Medium</p>
                 <p class="text-2xl font-black text-amber-700 tracking-tighter">{data.casesBySeverity.medium}</p>
             </div>
-            <div class="text-center p-5 rounded-2xl bg-white border border-blue-100 shadow-sm relative overflow-hidden">
+            <div class="text-center p-6 rounded-2xl bg-white border border-blue-100 shadow-sm relative overflow-hidden">
                 <div class="absolute top-0 left-0 right-0 h-1 bg-blue-500"></div>
                 <p class="text-[9px] uppercase font-black text-blue-600 mb-2 tracking-widest">Low</p>
                 <p class="text-2xl font-black text-blue-700 tracking-tighter">{data.casesBySeverity.low}</p>
             </div>
-            <div class="text-center p-5 rounded-2xl bg-white border border-gray-200 shadow-sm relative overflow-hidden">
+            <div class="text-center p-6 rounded-2xl bg-white border border-gray-200 shadow-sm relative overflow-hidden">
                 <div class="absolute top-0 left-0 right-0 h-1 bg-gray-400"></div>
                 <p class="text-[9px] uppercase font-black text-gray-500 mb-2 tracking-widest">Info</p>
                 <p class="text-2xl font-black text-gray-700 tracking-tighter">{data.casesBySeverity.informational}</p>
