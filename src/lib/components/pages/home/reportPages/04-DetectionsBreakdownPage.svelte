@@ -3,11 +3,10 @@
     import ReportPage from '../layout/ReportPage.svelte';
     import ReportSection from '../layout/ReportSection.svelte';
 
-    let { data, chunk, index, totalIntegrationPages, totalPages }: { 
+    let { data, chunk, index, totalPages }: {
         data: ReportData, 
         chunk: any[],
         index: number,
-        totalIntegrationPages: number,
         totalPages: number 
     } = $props();
     
@@ -143,8 +142,8 @@
         mt={index === 0 ? "mt-2" : "mt-8"}
     >
         <div class="grid grid-cols-2 gap-x-12 gap-y-4 py-4">
-            {#each chunk as integ}
-                <div class="flex items-center justify-between border-b border-gray-50 pb-2">
+            {#each chunk as integ, i}
+                <div class="flex items-center justify-between {i < chunk.length - 2 ? 'border-b border-gray-50 pb-2' : ''}">
                     <div class="flex items-center gap-3">
 <!--                        <div class="w-8 h-8 rounded-lg flex items-center justify-center {integ.enabled ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-50 text-gray-400'}">-->
 <!--                            {#if integ.enabled}-->

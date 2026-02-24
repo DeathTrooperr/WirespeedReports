@@ -119,7 +119,7 @@
 
     let primaryColor = $state('#6d28d9'); // Default primary
 
-    let periodType = $state<'monthly' | 'quarterly' | 'yearly' | 'all-time' | 'custom' | 'days'>('days');
+    let periodType = $state<'monthly' | 'quarterly' | 'yearly' | 'custom' | 'days'>('days');
     let selectedDays = $state(30);
     let selectedMonth = $state(new Date().toISOString().slice(0, 7));
     let selectedYear = $state(new Date().getFullYear());
@@ -150,21 +150,29 @@
                 if (selectedMonth) {
                     const [y, m] = selectedMonth.split('-').map(Number);
                     start = `${selectedMonth}-01`;
-                    end = new Date(y, m, 0).toISOString().slice(0, 10);
+                    if (selectedMonth === currentMonth) {
+                        end = today;
+                    } else {
+                        end = new Date(y, m, 0).toISOString().slice(0, 10);
+                    }
                 }
                 break;
             case 'quarterly':
                 const qStartMonth = (selectedQuarter - 1) * 3;
                 start = new Date(selectedYear, qStartMonth, 1).toISOString().slice(0, 10);
-                end = new Date(selectedYear, qStartMonth + 3, 0).toISOString().slice(0, 10);
+                if (selectedYear === currentYear && selectedQuarter === currentQuarter) {
+                    end = today;
+                } else {
+                    end = new Date(selectedYear, qStartMonth + 3, 0).toISOString().slice(0, 10);
+                }
                 break;
             case 'yearly':
                 start = `${selectedYear}-01-01`;
-                end = `${selectedYear}-12-31`;
-                break;
-            case 'all-time':
-                start = '2020-01-01'; 
-                end = new Date().toISOString().slice(0, 10);
+                if (selectedYear === currentYear) {
+                    end = today;
+                } else {
+                    end = `${selectedYear}-12-31`;
+                }
                 break;
             case 'custom':
                 start = customStart;
@@ -188,8 +196,6 @@
                 return `Q${selectedQuarter} ${selectedYear}`;
             case 'yearly':
                 return `${selectedYear}`;
-            case 'all-time':
-                return 'All Time';
             case 'custom':
                 if (customStart && customEnd) return `${customStart} to ${customEnd}`;
                 break;
@@ -272,6 +278,35 @@
             return;
         }
 
+        if (periodType === 'custom' && customStart && customEnd) {
+            const start = new Date(customStart);
+            const end = new Date(customEnd);
+            const diffInDays = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
+            if (diffInDays > 365) {
+                appError = {
+                    message: 'Custom range must be less than 1 year (365 days).',
+                    code: 'INVALID_CUSTOM_RANGE',
+                    timestamp: new Date().toISOString(),
+                    retryable: false
+                };
+                return;
+            }
+        }
+
+        // Validate date range is not in the future
+        const now = new Date();
+        const start = new Date(dateRange.start);
+        const end = new Date(dateRange.end);
+        if (start > now || end > now) {
+            appError = {
+                message: 'Reporting period cannot be in the future.',
+                code: 'FUTURE_DATE_RANGE',
+                timestamp: new Date().toISOString(),
+                retryable: false
+            };
+            return;
+        }
+
         if (!targetTeamId) isGenerating = true;
         appError = null;
         
@@ -339,6 +374,38 @@
 
         isBulkExporting = true;
         appError = null;
+
+        // Validate custom range is less than 1 year
+        if (periodType === 'custom' && customStart && customEnd) {
+            const start = new Date(customStart);
+            const end = new Date(customEnd);
+            const diffInDays = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
+            if (diffInDays > 365) {
+                appError = {
+                    message: 'Custom range must be less than 1 year (365 days).',
+                    code: 'INVALID_CUSTOM_RANGE',
+                    timestamp: new Date().toISOString(),
+                    retryable: false
+                };
+                isBulkExporting = false;
+                return;
+            }
+        }
+
+        // Validate date range is not in the future
+        const now = new Date();
+        const startRange = new Date(dateRange.start);
+        const endRange = new Date(dateRange.end);
+        if (startRange > now || endRange > now) {
+            appError = {
+                message: 'Reporting period cannot be in the future.',
+                code: 'FUTURE_DATE_RANGE',
+                timestamp: new Date().toISOString(),
+                retryable: false
+            };
+            isBulkExporting = false;
+            return;
+        }
 
         try {
             const response = await fetch('/api/generate/bulk', {
@@ -495,12 +562,6 @@
                 <div class="space-y-4 pt-2">
                     <p class="text-[10px] font-black uppercase tracking-widest text-white/80">Reporting Period</p>
                     
-                    <div class="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-                        <p class="text-[10px] text-amber-200/70 leading-relaxed italic">
-                            <strong>Note:</strong> Due to current API limitations, the reporting period is currently locked to fixed day intervals.
-                        </p>
-                    </div>
-
                     <div class="space-y-2">
                         <label for="periodType" class="text-xs text-white/90">Type</label>
                         <select 
@@ -509,11 +570,10 @@
                             class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-white/40 transition-colors text-white [color-scheme:dark] *:bg-[#6d28d9]"
                         >
                             <option value="days">Days</option>
-                            <option value="monthly" disabled>Monthly</option>
-                            <option value="quarterly" disabled>Quarterly</option>
-                            <option value="yearly" disabled>Yearly</option>
-                            <option value="all-time" disabled>All Time</option>
-                            <option value="custom" disabled>Custom Range</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="yearly">Yearly</option>
+                            <option value="custom">Custom Range</option>
                         </select>
                     </div>
 
@@ -528,6 +588,7 @@
                                 <option value={30}>30 Days</option>
                                 <option value={60}>60 Days</option>
                                 <option value={90}>90 Days</option>
+                                <option value={180}>180 Days</option>
                             </select>
                         </div>
                     {:else if periodType === 'monthly'}

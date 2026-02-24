@@ -80,43 +80,49 @@ export async function getReportData(apiKey: string, timeframe: { startDate: stri
         };
     }
 
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+    let start = new Date(startDate);
+    let end = new Date(endDate);
+    const now = new Date();
+    if (end > now) end = now;
     const startDateString = start.toISOString();
+    const endDateString = end.toISOString();
     const diffTime = Math.abs(end.getTime() - start.getTime());
     const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
+    const period = { startDate: startDateString, endDate: endDateString };
+
+    console.log(`Report period: ${startDateString} to ${endDateString}`)
 
     const [team, stats, severityStats, mttr, mttd, mttv, mttc, cases, detections, privateCredentialCases, publicCredentialCases, detectionStatsByCategoryClass, integrationsRes] = await Promise.all([
         api.getCurrentTeam(),
-        api.getTeamStatistics(days),
-        api.getCasesStatsBySeverity(days),
-        api.getMttr(days),
-        api.getMttd(days),
-        api.getMttv(days),
-        api.getMttc(days),
+        api.getTeamStatistics(period),
+        api.getCasesStatsBySeverity(period),
+        api.getMttr(period),
+        api.getMttd(period),
+        api.getMttv(period),
+        api.getMttc(period),
         api.getCases({
             orderBy: 'createdAt',
             orderDir: 'desc',
-            createdAt: { gte: startDateString }
+            createdAt: { gte: startDateString, lte: endDateString }
         }),
         api.getDetections({
             orderBy: 'createdAt',
             orderDir: 'desc',
-            createdAt: { gte: startDateString }
+            createdAt: { gte: startDateString, lte: endDateString }
         }),
         api.getCases({
             orderBy: 'createdAt',
             orderDir: 'desc',
-            createdAt: { gte: startDateString },
+            createdAt: { gte: startDateString, lte: endDateString },
             category: 'IDENTITY__PRIVATE_CREDENTIAL_EXPOSURE'
         }),
         api.getCases({
             orderBy: 'createdAt',
             orderDir: 'desc',
-            createdAt: { gte: startDateString },
+            createdAt: { gte: startDateString, lte: endDateString },
             category: 'IDENTITY__PUBLIC_CREDENTIAL_EXPOSURE'
         }),
-        api.getDetectionStatsByCategoryClass(days),
+        api.getDetectionStatsByCategoryClass(period),
         api.getIntegrations({ includeDisabled: true })
     ]);
 
@@ -156,7 +162,7 @@ export async function getReportData(apiKey: string, timeframe: { startDate: stri
     const report: ReportData = {
         companyName: team?.name || 'Unknown Team',
         reportPeriodLabel: periodLabel || '',
-        reportPeriod: `Last ${days} Days`,
+        reportPeriod: periodLabel || `Last ${days} Days`,
         branding: branding || undefined,
         executiveSummary:
             `During the time frame of this report, <strong>Wirespeed analyzed</strong> <strong class="text-primary">${(totalEvents || 0).toLocaleString()}</strong> events from <strong class="text-primary">${stats?.billableEndpoints || 0}</strong> ` +

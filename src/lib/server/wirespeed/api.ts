@@ -14,7 +14,8 @@ import type {
 	PlatformLogoResponse,
 	Team,
 	TeamStatistics,
-	TimeAverageAndChange
+	TimeAverageAndChange,
+	ReportPeriodDto
 } from '../types/wirespeed.types.js';
 
 export class WirespeedApi {
@@ -48,21 +49,20 @@ export class WirespeedApi {
 	/**
 	 * Get team statistics report
 	 */
-	async getTeamStatistics(days: number): Promise<TeamStatistics> {
+	async getTeamStatistics(period: ReportPeriodDto): Promise<TeamStatistics> {
 		return this.request<TeamStatistics>('/team/statistics', {
 			method: 'POST',
-			body: JSON.stringify({ days })
+			body: JSON.stringify(period)
 		});
 	}
 
 	/**
 	 * Get case statistics by severity
-	 * Can not be greater than 90 days.
 	 */
-	async getCasesStatsBySeverity(days: number): Promise<CaseSeverityStat[]> {
+	async getCasesStatsBySeverity(period: ReportPeriodDto): Promise<CaseSeverityStat[]> {
 		return this.request<CaseSeverityStat[]>('/cases/stats/severity', {
 			method: 'POST',
-			body: JSON.stringify({ days })
+			body: JSON.stringify(period)
 		});
 	}
 
@@ -98,40 +98,40 @@ export class WirespeedApi {
 	/**
 	 * Calculate mean time to resolution
 	 */
-	async getMttr(days: number): Promise<TimeAverageAndChange> {
+	async getMttr(period: ReportPeriodDto): Promise<TimeAverageAndChange> {
 		return this.request<TimeAverageAndChange>('/cases/mttr', {
 			method: 'POST',
-			body: JSON.stringify({ days })
+			body: JSON.stringify(period)
 		});
 	}
 
 	/**
 	 * Calculate mean time to detect
 	 */
-	async getMttd(days: number): Promise<TimeAverageAndChange> {
+	async getMttd(period: ReportPeriodDto): Promise<TimeAverageAndChange> {
 		return this.request<TimeAverageAndChange>('/detection/mttd', {
 			method: 'POST',
-			body: JSON.stringify({ days })
+			body: JSON.stringify(period)
 		});
 	}
 
 	/**
 	 * Calculate mean time to verdict
 	 */
-	async getMttv(days: number): Promise<TimeAverageAndChange> {
+	async getMttv(period: ReportPeriodDto): Promise<TimeAverageAndChange> {
 		return this.request<TimeAverageAndChange>('/detection/mttv', {
 			method: 'POST',
-			body: JSON.stringify({ days })
+			body: JSON.stringify(period)
 		});
 	}
 
 	/**
 	 * Calculate mean time to contain
 	 */
-	async getMttc(days: number): Promise<TimeAverageAndChange> {
+	async getMttc(period: ReportPeriodDto): Promise<TimeAverageAndChange> {
 		return this.request<TimeAverageAndChange>('/cases/mttc', {
 			method: 'POST',
-			body: JSON.stringify({ days })
+			body: JSON.stringify(period)
 		});
 	}
 
@@ -173,10 +173,10 @@ export class WirespeedApi {
 	/**
 	 * Get detection statistics by category class
 	 */
-	async getDetectionStatsByCategoryClass(days: number): Promise<DetectionCategoryClassStat[]> {
+	async getDetectionStatsByCategoryClass(period: ReportPeriodDto): Promise<DetectionCategoryClassStat[]> {
 		return this.request<DetectionCategoryClassStat[]>('/detection/stats/category-class', {
 			method: 'POST',
-			body: JSON.stringify({ days })
+			body: JSON.stringify(period)
 		});
 	}
 

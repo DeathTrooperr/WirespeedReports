@@ -62,6 +62,11 @@ export interface SearchTeam {
 	totalCount: number;
 }
 
+export interface ReportPeriodDto {
+	startDate?: string;
+	endDate?: string;
+}
+
 export interface TeamStatisticsOperatingSystem {
 	operatingSystem: string;
 	count: number;
