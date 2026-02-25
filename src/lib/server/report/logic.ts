@@ -3,7 +3,8 @@ import type {
 	Case,
 	TeamOCSFStatistic,
 	TeamStatisticsLocation,
-    Team
+	Team,
+	TeamStatistics
 } from '$lib/server/types/wirespeed.types.js';
 import { WirespeedApi } from '$lib/server/wirespeed/api.js';
 import sanitizeHtml from 'sanitize-html';
@@ -16,6 +17,14 @@ function sanitizeText(text: string | undefined): string {
     })
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+/**
+ * Format a date into the ISO 23-byte format (YYYY-MM-DDTHH:mm:ss.sss) 
+ * that the Wirespeed API expects for DateTime64 parameters.
+ */
+function formatDateForApi(date: Date): string {
+    return date.toISOString().slice(0, 23);
 }
 
 function formatTimeMetric(metric: { average: number | string; unit: string }) {
@@ -84,17 +93,37 @@ export async function getReportData(apiKey: string, timeframe: { startDate: stri
     let end = new Date(endDate);
     const now = new Date();
     if (end > now) end = now;
-    const startDateString = start.toISOString();
-    const endDateString = end.toISOString();
+    const startDateString = formatDateForApi(start);
+    const endDateString = formatDateForApi(end);
     const diffTime = Math.abs(end.getTime() - start.getTime());
     const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
     const period = { startDate: startDateString, endDate: endDateString };
 
-    console.log(`Report period: ${startDateString} to ${endDateString}`)
-
-    const [team, stats, severityStats, mttr, mttd, mttv, mttc, cases, detections, privateCredentialCases, publicCredentialCases, detectionStatsByCategoryClass, integrationsRes] = await Promise.all([
+    const [
+        team,
+        statsDetections,
+        statsOSRes,
+        statsResources,
+        statsGeographyRes,
+        statsEventsRes,
+        severityStats,
+        mttr,
+        mttd,
+        mttv,
+        mttc,
+        cases,
+        detections,
+        privateCredentialCases,
+        publicCredentialCases,
+        detectionStatsByCategoryClass,
+        integrationsRes
+    ] = await Promise.all([
         api.getCurrentTeam(),
-        api.getTeamStatistics(period),
+        api.getTeamStatisticsDetections(period),
+        api.getTeamStatisticsOperatingSystems(period),
+        api.getTeamStatisticsResources(period),
+        api.getTeamStatisticsGeography(period),
+        api.getTeamStatisticsEvents(period),
         api.getCasesStatsBySeverity(period),
         api.getMttr(period),
         api.getMttd(period),
@@ -126,24 +155,34 @@ export async function getReportData(apiKey: string, timeframe: { startDate: stri
         api.getIntegrations({ includeDisabled: true })
     ]);
 
+    const stats: Partial<TeamStatistics> = {
+        ...statsDetections,
+        operatingSystems: statsOSRes?.operatingSystems || [],
+        billableUsers: statsResources?.billableUsers || 0,
+        billableEndpoints: statsResources?.billableEndpoints || 0,
+        detectionLocations: statsGeographyRes?.detectionLocations || [],
+        suspiciousLoginLocations: statsGeographyRes?.suspiciousLoginLocations || [],
+        ocsfStatistics: statsEventsRes?.ocsfStatistics || []
+    };
+
     const credentialCases = {
-        data: [...(privateCredentialCases?.data || []), ...(publicCredentialCases?.data || [])].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+        data: [...(Array.isArray(privateCredentialCases?.data) ? privateCredentialCases.data : []), ...(Array.isArray(publicCredentialCases?.data) ? publicCredentialCases.data : [])].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
         totalCount: (privateCredentialCases?.totalCount || 0) + (publicCredentialCases?.totalCount || 0)
     };
 
-    const detectionAssets = await Promise.all((detections?.data || []).map((d) => api.getAssetsByDetectionId(d.id)));
+    const detectionAssets = await Promise.all((Array.isArray(detections?.data) ? detections.data : []).map((d) => api.getAssetsByDetectionId(d.id)));
 
-    const totalEvents = (stats?.ocsfStatistics || []).reduce((acc, curr) => acc + Number(curr?.totalEvents || 0), 0);
+    const totalEvents = (Array.isArray(stats?.ocsfStatistics) ? stats.ocsfStatistics : []).reduce((acc, curr) => acc + Number(curr?.totalEvents || 0), 0);
 
     const endpointsMap: Record<string, number> = {};
     const identitiesMap: Record<string, number> = {};
 
     detectionAssets.forEach((assets) => {
-        (assets?.endpoints || []).forEach((e) => {
+        (Array.isArray(assets?.endpoints) ? assets.endpoints : []).forEach((e) => {
             const endpoint = e.displayName || e.name;
             if (endpoint) endpointsMap[endpoint] = (endpointsMap[endpoint] || 0) + 1;
         });
-        (assets?.directory || []).forEach((u) => {
+        (Array.isArray(assets?.directory) ? assets.directory : []).forEach((u) => {
             const identity = u.displayName || u.email;
             if (identity && u.directoryId) identitiesMap[identity] = (identitiesMap[identity] || 0) + 1;
         });
@@ -216,14 +255,14 @@ export async function getReportData(apiKey: string, timeframe: { startDate: stri
             wouldContain: stats?.potentialContainmentDetections || 0
         },
 
-        eventsByIntegration: (stats?.ocsfStatistics || []).map((s: any) => ({
+        eventsByIntegration: (Array.isArray(stats?.ocsfStatistics) ? stats.ocsfStatistics : []).map((s: any) => ({
             name: s?.integration?.config?.name || 'Unknown Integration',
             processed: `${((s?.totalBytes || 0) / 1024 / 1024).toFixed(2)} MB`,
             count: (s?.totalEvents || 0).toLocaleString(),
             countValue: Number(s?.totalEvents || 0)
         })),
 
-        endpointsByOS: (stats?.operatingSystems || []).reduce(
+        endpointsByOS: (Array.isArray(stats?.operatingSystems) ? stats.operatingSystems : []).reduce(
             (acc: EndpointOS, { operatingSystem, count }: any) => {
                 const name = (operatingSystem ?? '').toLowerCase();
                 const n = Number(count) || 0;
@@ -264,7 +303,7 @@ export async function getReportData(apiKey: string, timeframe: { startDate: stri
             informational: severityStats?.find((s) => s.severity === 'INFORMATIONAL')?.count ?? 0
         },
 
-        suspiciousLoginLocations: (stats?.suspiciousLoginLocations || [])
+        suspiciousLoginLocations: (Array.isArray(stats?.suspiciousLoginLocations) ? stats.suspiciousLoginLocations : [])
             .reduce((acc: TeamStatisticsLocation[], l: TeamStatisticsLocation) => {
                 acc.push(l);
                 return acc.sort((a, b) => (b.count || 0) - (a.count || 0)).slice(0, 10);
@@ -274,7 +313,7 @@ export async function getReportData(apiKey: string, timeframe: { startDate: stri
                 count: l.count || 0
             })),
 
-        integrations: (integrationsRes?.data || []).map((i) => ({
+        integrations: (Array.isArray(integrationsRes?.data) ? integrationsRes.data : []).map((i) => ({
             name: (i.platform == "generic-json" || i.platform == "generic-syslog") ? i.identityFields?.label as string : i.config?.name || i.platform,
             types: getIntegrationTypes(i.config?.description),
             platform: String(i.platform || ''),
@@ -282,7 +321,7 @@ export async function getReportData(apiKey: string, timeframe: { startDate: stri
             logo: i.config?.logoLight || i.config?.logo
         })).filter(i => !["have-i-been-pwned", "ipinfo", "reversing-labs", "wirespeed" ,"sms", "slack", "email", "microsoft-teams"].includes(i.platform)),
 
-        detectionStatsByCategoryClass: (detectionStatsByCategoryClass || []).map(c => ({
+        detectionStatsByCategoryClass: (Array.isArray(detectionStatsByCategoryClass) ? detectionStatsByCategoryClass : []).map(c => ({
             categoryClass: c.categoryClass || 'OTHER',
             displayName: c.displayName || 'Other',
             count: c.count || 0,
@@ -303,7 +342,7 @@ export async function getReportData(apiKey: string, timeframe: { startDate: stri
             const totalDetections = stats?.totalDetections || 1;
             
             return fixedCategories.map(cat => {
-                const found = (detectionStatsByCategoryClass || []).find(
+                const found = (Array.isArray(detectionStatsByCategoryClass) ? detectionStatsByCategoryClass : []).find(
                     s => s.categoryClass?.toLowerCase() === cat.key.toLowerCase() || 
                          s.displayName?.toLowerCase() === cat.label.toLowerCase()
                 );
@@ -345,9 +384,9 @@ export async function getReportData(apiKey: string, timeframe: { startDate: stri
 
         darkWebReport: {
             totalExposures: credentialCases.totalCount || 0,
-            highRiskExposures: (credentialCases.data || []).filter(c => c.severity === 'HIGH' || c.severity === 'CRITICAL').length,
-            compromisedAccounts: (credentialCases.data || []).length, // Each case is typically an exposure
-            recentLeaks: (credentialCases.data || []).slice(0, 5).map(c => ({
+            highRiskExposures: (Array.isArray(credentialCases.data) ? credentialCases.data : []).filter(c => c.severity === 'HIGH' || c.severity === 'CRITICAL').length,
+            compromisedAccounts: (Array.isArray(credentialCases.data) ? credentialCases.data : []).length, // Each case is typically an exposure
+            recentLeaks: (Array.isArray(credentialCases.data) ? credentialCases.data : []).slice(0, 5).map(c => ({
                 date: new Date(c.createdAt || Date.now()).toISOString().slice(0, 10),
                 source: c.platforms?.[0] || 'Web Leak',
                 type: c.title || 'Unknown Exposure',

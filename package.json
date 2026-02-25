@@ -1,6 +1,6 @@
 {
-	"name": "wirespeed-reports",
-	"version": "0.0.1",
+	"name": "wirespeed-reports-builder",
+	"version": "1.0.0",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run prepack",

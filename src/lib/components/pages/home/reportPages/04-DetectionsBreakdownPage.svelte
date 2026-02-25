@@ -3,10 +3,11 @@
     import ReportPage from '../layout/ReportPage.svelte';
     import ReportSection from '../layout/ReportSection.svelte';
 
-    let { data, chunk, index, totalPages }: {
+    let { data, chunk, index, totalIntegrationPages, totalPages }: {
         data: ReportData, 
         chunk: any[],
         index: number,
+        totalIntegrationPages: number,
         totalPages: number 
     } = $props();
     

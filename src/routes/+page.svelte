@@ -134,6 +134,23 @@
     const currentMonth = new Date().toISOString().slice(0, 7);
     const currentYear = new Date().getFullYear();
     const currentQuarter = Math.floor(new Date().getMonth() / 3) + 1;
+    
+    const customStartMax = $derived(customEnd || today);
+    const customStartMin = $derived.by(() => {
+        if (!customEnd) return '';
+        const date = new Date(customEnd);
+        date.setUTCFullYear(date.getUTCFullYear() - 1);
+        return date.toISOString().slice(0, 10);
+    });
+
+    const customEndMin = $derived(customStart || '');
+    const customEndMax = $derived.by(() => {
+        if (!customStart) return today;
+        const date = new Date(customStart);
+        date.setUTCFullYear(date.getUTCFullYear() + 1);
+        const oneYearLater = date.toISOString().slice(0, 10);
+        return oneYearLater < today ? oneYearLater : today;
+    });
 
     const dateRange = $derived.by(() => {
         let start = '';
@@ -281,10 +298,22 @@
         if (periodType === 'custom' && customStart && customEnd) {
             const start = new Date(customStart);
             const end = new Date(customEnd);
-            const diffInDays = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
-            if (diffInDays > 365) {
+            
+            if (end < start) {
                 appError = {
-                    message: 'Custom range must be less than 1 year (365 days).',
+                    message: 'End date cannot be before start date.',
+                    code: 'INVALID_DATE_ORDER',
+                    timestamp: new Date().toISOString(),
+                    retryable: false
+                };
+                return;
+            }
+
+            const maxEnd = new Date(customStart);
+            maxEnd.setUTCFullYear(maxEnd.getUTCFullYear() + 1);
+            if (end > maxEnd) {
+                appError = {
+                    message: 'Custom range must be less than 1 year.',
                     code: 'INVALID_CUSTOM_RANGE',
                     timestamp: new Date().toISOString(),
                     retryable: false
@@ -379,10 +408,23 @@
         if (periodType === 'custom' && customStart && customEnd) {
             const start = new Date(customStart);
             const end = new Date(customEnd);
-            const diffInDays = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
-            if (diffInDays > 365) {
+
+            if (end < start) {
                 appError = {
-                    message: 'Custom range must be less than 1 year (365 days).',
+                    message: 'End date cannot be before start date.',
+                    code: 'INVALID_DATE_ORDER',
+                    timestamp: new Date().toISOString(),
+                    retryable: false
+                };
+                isBulkExporting = false;
+                return;
+            }
+
+            const maxEnd = new Date(customStart);
+            maxEnd.setUTCFullYear(maxEnd.getUTCFullYear() + 1);
+            if (end > maxEnd) {
+                appError = {
+                    message: 'Custom range must be less than 1 year.',
                     code: 'INVALID_CUSTOM_RANGE',
                     timestamp: new Date().toISOString(),
                     retryable: false
@@ -651,7 +693,8 @@
                                 type="date" 
                                 id="customStart"
                                 bind:value={customStart}
-                                max={today}
+                                min={customStartMin}
+                                max={customStartMax}
                                 class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-white/40 transition-colors text-white [color-scheme:dark]"
                             />
                         </div>
@@ -661,10 +704,14 @@
                                 type="date" 
                                 id="customEnd"
                                 bind:value={customEnd}
-                                max={today}
+                                min={customEndMin}
+                                max={customEndMax}
                                 class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-white/40 transition-colors text-white [color-scheme:dark]"
                             />
                         </div>
+                        <p class="text-[10px] text-white/50 pt-1 italic">
+                            Custom ranges are limited to 1 year.
+                        </p>
                     {/if}
                 </div>
             </div>

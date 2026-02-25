@@ -144,6 +144,7 @@ export interface ReportData {
         percentage: number;
         count: number;
     }>;
+    escalatedCases: EscalatedCase[];
     darkWebReport: {
         totalExposures: number;
         highRiskExposures: number;

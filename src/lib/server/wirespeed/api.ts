@@ -2,7 +2,6 @@ import type {
 	Assets,
 	CaseSeverityStat,
 	Cases,
-	Detection,
 	DetectionCategoryClassStat,
 	Detections,
 	IntegrationSearch,
@@ -14,6 +13,9 @@ import type {
 	PlatformLogoResponse,
 	Team,
 	TeamStatistics,
+	TeamOCSFStatistic,
+	TeamStatisticsLocation,
+	TeamStatisticsOperatingSystem,
 	TimeAverageAndChange,
 	ReportPeriodDto
 } from '../types/wirespeed.types.js';
@@ -47,10 +49,50 @@ export class WirespeedApi {
 	}
 
 	/**
-	 * Get team statistics report
+	 * Get team statistics for operating systems
 	 */
-	async getTeamStatistics(period: ReportPeriodDto): Promise<TeamStatistics> {
-		return this.request<TeamStatistics>('/team/statistics', {
+	async getTeamStatisticsOperatingSystems(period: ReportPeriodDto): Promise<{ operatingSystems: TeamStatisticsOperatingSystem[] }> {
+		return this.request<{ operatingSystems: TeamStatisticsOperatingSystem[] }>('/team/statistics/operating-systems', {
+			method: 'POST',
+			body: JSON.stringify(period)
+		});
+	}
+
+	/**
+	 * Get team statistics for resources (billable endpoints)
+	 */
+	async getTeamStatisticsResources(period: ReportPeriodDto): Promise<{ billableUsers: number; billableEndpoints: number }> {
+		return this.request<{ billableUsers: number; billableEndpoints: number }>('/team/statistics/resources', {
+			method: 'POST',
+			body: JSON.stringify(period)
+		});
+	}
+
+	/**
+	 * Get team statistics for detections
+	 */
+	async getTeamStatisticsDetections(period: ReportPeriodDto): Promise<Partial<TeamStatistics>> {
+		return this.request<Partial<TeamStatistics>>('/team/statistics/detections', {
+			method: 'POST',
+			body: JSON.stringify(period)
+		});
+	}
+
+	/**
+	 * Get team statistics for geography (detections by country)
+	 */
+	async getTeamStatisticsGeography(period: ReportPeriodDto): Promise<{ detectionLocations: TeamStatisticsLocation[]; suspiciousLoginLocations: TeamStatisticsLocation[] }> {
+		return this.request<{ detectionLocations: TeamStatisticsLocation[]; suspiciousLoginLocations: TeamStatisticsLocation[] }>('/team/statistics/geography', {
+			method: 'POST',
+			body: JSON.stringify(period)
+		});
+	}
+
+	/**
+	 * Get team statistics for OCSF events
+	 */
+	async getTeamStatisticsEvents(period: ReportPeriodDto): Promise<{ ocsfStatistics: TeamOCSFStatistic[] }> {
+		return this.request<{ ocsfStatistics: TeamOCSFStatistic[] }>('/team/statistics/events', {
 			method: 'POST',
 			body: JSON.stringify(period)
 		});

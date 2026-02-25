@@ -1,5 +1,5 @@
 import { error, json } from '@sveltejs/kit';
-import type { RequestHandler } from '../../../../../../.svelte-kit/types/src/routes';
+import type { RequestHandler } from './$types.js';
 import { getReportData } from '$lib/server/report/logic.js';
 import puppeteer from '@cloudflare/puppeteer';
 import JSZip from 'jszip';
